@@ -1,5 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, CalendarDays, Clock3, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw } from "lucide-react";
+import { io } from "socket.io-client";
+import { ApplicationChat } from "@/components/site/ApplicationChat";
+
+const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
+
+type Application = {
+  _id: string;
+  studentType: "adult" | "child";
+  childName?: string;
+  childAge?: number;
+  relation?: string;
+  parentName?: string;
+  name?: string;
+  phone: string;
+  email: string;
+  message?: string;
+  createdAt: string;
+};
+
+type Conversation = {
+  _id: string;
+  visitorName: string;
+  visitorEmail: string;
+  lastMessageAt: string;
+  lastMessage?: {
+    sender: "visitor" | "admin";
+    senderName: string;
+    body: string;
+    createdAt: string;
+  };
+};
+
+async function getAdminData<T>(path: string): Promise<T> {
+  const response = await fetch(`${apiUrl}/api/admin/${path}`, { credentials: "include" });
+  const result = (await response.json().catch(() => ({}))) as T & { message?: string };
+  if (!response.ok) throw new Error(result.message ?? "Could not load admin data.");
+  return result;
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -11,166 +50,247 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const courses = [
-  { name: "First Moves", level: "Beginner", ages: "Ages 5-8" },
-  { name: "Tactics Track", level: "Intermediate", ages: "Ages 8-14" },
-  { name: "Tournament Ready", level: "Advanced", ages: "Ages 10-16" },
-];
-
-const sampleUserCount = 128;
-const sampleMembers = [
-  { id: "preview-member-001", full_name: "Preview Member 1", created_at: "2026-09-25" },
-  { id: "preview-member-002", full_name: "Preview Member 2", created_at: "2026-09-22" },
-  { id: "preview-member-003", full_name: "Preview Member 3", created_at: "2026-09-18" },
-];
-
 function AdminPage() {
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversationId, setSelectedConversationId] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    let socket: ReturnType<typeof io> | undefined;
+
+    async function loadAdminData() {
+      setIsLoading(true);
+      setError("");
+      try {
+        const [applicationResult, conversationResult] = await Promise.all([
+          getAdminData<{ applications: Application[] }>("applications"),
+          getAdminData<{ conversations: Conversation[] }>("conversations"),
+        ]);
+        if (!active) return;
+
+        setApplications(applicationResult.applications);
+        setConversations(conversationResult.conversations);
+        setSelectedConversationId(
+          (current) => current || conversationResult.conversations[0]?._id || "",
+        );
+
+        socket = io(apiUrl, { withCredentials: true });
+        socket.on("chat:conversation-updated", (updated: Conversation) => {
+          if (!active) return;
+          setConversations((current) => {
+            const remaining = current.filter((item) => item._id !== updated._id);
+            return [updated, ...remaining];
+          });
+        });
+      } catch (loadError) {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : "Could not load admin data.");
+        }
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    }
+
+    void loadAdminData();
+    return () => {
+      active = false;
+      socket?.disconnect();
+    };
+  }, [reloadKey]);
+
+  const selectedConversation = conversations.find(
+    (conversation) => conversation._id === selectedConversationId,
+  );
+
   return (
     <section className="container-page py-10 sm:py-14">
-      <div className="flex flex-wrap items-end justify-between gap-5 border-b border-border pb-7">
+      <header className="flex flex-wrap items-end justify-between gap-5 border-b border-border pb-7">
         <div>
           <span className="eyebrow">Administration</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">Admin workspace</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Membership and the live programs offered by the institute.
+            Review submitted applications and reply to families in real time.
           </p>
         </div>
-        <span className="border border-accent bg-accent/20 px-3 py-2 text-sm font-medium">
-          Frontend preview
-        </span>
-      </div>
-
-      <div className="space-y-10 pt-8">
-        <div
-          role="status"
-          className="flex flex-wrap items-center gap-x-3 gap-y-1 border border-accent bg-accent/20 px-4 py-3 text-sm"
+        <button
+          type="button"
+          onClick={() => setReloadKey((key) => key + 1)}
+          disabled={isLoading}
+          className="btn-outline inline-flex items-center gap-2"
         >
-          <span className="font-semibold">Sample data only</span>
-          <span className="text-muted-foreground">Live account data will be connected later.</span>
+          <RefreshCw className={`size-4 ${isLoading ? "animate-spin" : ""}`} />
+          Refresh
+        </button>
+      </header>
+
+      {error ? (
+        <div className="mt-8 border border-accent bg-accent/20 px-5 py-4" role="alert">
+          <p className="font-semibold">Admin access unavailable</p>
+          <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in with the account listed in the server&apos;s <code>ADMIN_EMAILS</code> setting.
+          </p>
+          <Link to="/auth" className="btn-primary mt-4 inline-flex">
+            Go to sign in
+          </Link>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
-          <article className="card-soft flex min-h-52 flex-col justify-between p-6 sm:p-8">
-            <div className="flex items-start justify-between gap-4">
+      ) : (
+        <div className="grid gap-10 pt-8 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]">
+          <section aria-labelledby="applications-heading">
+            <div className="mb-4 flex items-end justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Registered users</p>
-                <p className="mt-3 font-display text-5xl text-primary" aria-live="polite">
-                  {sampleUserCount.toLocaleString()}
-                </p>
+                <span className="eyebrow">Applications</span>
+                <h2 id="applications-heading" className="mt-2 text-2xl">
+                  Submitted applications
+                </h2>
               </div>
-              <span className="grid size-11 place-items-center rounded-full bg-secondary text-primary">
-                <Users className="size-5" />
+              <span className="text-sm text-muted-foreground" aria-live="polite">
+                {applications.length} total
               </span>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">
-              Sample profile count for frontend testing.
-            </p>
-          </article>
 
-          <article className="flex min-h-52 flex-col justify-between bg-ink p-6 text-ink-foreground sm:p-8">
-            <div>
-              <p className="text-sm text-ink-foreground/70">Program format</p>
-              <p className="mt-3 font-display text-4xl">16 sessions</p>
-            </div>
-            <Link
-              to="/method"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
-            >
-              Review teaching method <ArrowRight className="size-4" />
-            </Link>
-          </article>
-        </div>
-
-        <section aria-labelledby="members-heading">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <span className="eyebrow">Accounts</span>
-              <h2 id="members-heading" className="mt-2 text-2xl">
-                Recent members
-              </h2>
-            </div>
-            <span className="text-sm text-muted-foreground">Sample profiles</span>
-          </div>
-          <div className="overflow-hidden rounded-md border border-border">
-            {sampleMembers.length ? (
-              <ul className="divide-y divide-border">
-                {sampleMembers.map((member) => (
-                  <li
-                    key={member.id}
-                    className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 bg-card px-4 py-4 sm:px-5"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
-                        <Users className="size-4" />
-                      </span>
-                      <span className="truncate text-sm font-medium">
-                        {member.full_name || "Name not provided"}
-                      </span>
-                    </div>
-                    <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                      <CalendarDays className="size-4" />
-                      {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-                        new Date(member.created_at),
-                      )}
-                    </span>
-                  </li>
+            {isLoading ? (
+              <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                Loading applications...
+              </p>
+            ) : applications.length ? (
+              <div className="divide-y divide-border border-y border-border">
+                {applications.map((application) => (
+                  <ApplicationDetails key={application._id} application={application} />
                 ))}
-              </ul>
+              </div>
             ) : (
-              <p className="bg-card px-5 py-8 text-sm text-muted-foreground">
-                No member profiles yet.
+              <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                No applications have been submitted yet.
               </p>
             )}
-          </div>
-        </section>
+          </section>
 
-        <section aria-labelledby="programs-heading">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <span className="eyebrow">Published catalog</span>
-              <h2 id="programs-heading" className="mt-2 text-2xl">
-                Course tracks
+          <section aria-labelledby="chat-heading" className="min-w-0">
+            <div className="mb-4">
+              <span className="eyebrow">Live support</span>
+              <h2 id="chat-heading" className="mt-2 text-2xl">
+                Applicant conversations
               </h2>
             </div>
-            <Link to="/prices" className="text-sm font-semibold text-primary hover:underline">
-              View public pricing <ArrowRight className="ml-1 inline size-4" />
-            </Link>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {courses.map((course) => (
-              <article key={course.name} className="card-soft p-5">
-                <BookOpen className="size-5 text-primary" />
-                <h3 className="mt-4 text-lg">{course.name}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {course.level} <span aria-hidden="true">&middot;</span> {course.ages}
-                </p>
-                <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
-                  <Clock3 className="size-3.5" /> 16 live sessions
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
 
-        <section aria-labelledby="site-links-heading" className="border-t border-border pt-7">
-          <h2 id="site-links-heading" className="text-xl">
-            Site pages
-          </h2>
-          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium">
-            <Link to="/contact" className="text-primary hover:underline">
-              Demo request form
-            </Link>
-            <Link to="/method" className="text-primary hover:underline">
-              Teaching method
-            </Link>
-            <Link to="/prices" className="text-primary hover:underline">
-              Courses and pricing
-            </Link>
-          </div>
-          <p className="mt-4 max-w-2xl text-xs text-muted-foreground">
-            Demo form submissions are not currently saved to the admin workspace.
-          </p>
-        </section>
-      </div>
+            {conversations.length ? (
+              <div className="grid gap-5 lg:grid-cols-[minmax(10rem,0.7fr)_minmax(0,1.3fr)] xl:grid-cols-1 2xl:grid-cols-[minmax(10rem,0.7fr)_minmax(0,1.3fr)]">
+                <div className="max-h-[28rem] divide-y divide-border overflow-y-auto border-y border-border">
+                  {conversations.map((conversation) => (
+                    <button
+                      key={conversation._id}
+                      type="button"
+                      onClick={() => setSelectedConversationId(conversation._id)}
+                      aria-pressed={conversation._id === selectedConversationId}
+                      className={`block w-full px-3 py-3 text-left transition-colors hover:bg-muted ${
+                        conversation._id === selectedConversationId ? "bg-muted" : ""
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 text-sm font-semibold">
+                        <MessageCircle className="size-4 shrink-0 text-primary" />
+                        <span className="truncate">{conversation.visitorName}</span>
+                      </span>
+                      <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
+                        {conversation.lastMessage?.body ?? conversation.visitorEmail}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {selectedConversation ? (
+                  <ApplicationChat
+                    key={selectedConversation._id}
+                    conversationId={selectedConversation._id}
+                    visitorName={selectedConversation.visitorName}
+                    mode="admin"
+                  />
+                ) : (
+                  <p className="py-8 text-sm text-muted-foreground">Choose a conversation.</p>
+                )}
+              </div>
+            ) : (
+              <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                No conversations yet. A chat starts when an applicant sends a message after
+                applying.
+              </p>
+            )}
+          </section>
+        </div>
+      )}
     </section>
+  );
+}
+
+function ApplicationDetails({ application }: { application: Application }) {
+  const studentName =
+    application.studentType === "child" ? application.childName : application.name;
+
+  return (
+    <article className="py-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="font-semibold">{studentName || "Name not provided"}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {application.studentType === "child" ? "Child" : "Adult"} application
+            {application.childAge ? ` · age ${application.childAge}` : ""}
+          </p>
+        </div>
+        <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarDays className="size-3.5" />
+          {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+            new Date(application.createdAt),
+          )}
+        </time>
+      </div>
+
+      <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+        {application.studentType === "child" ? (
+          <>
+            <Detail label="Parent / guardian" value={application.parentName} />
+            <Detail label="Relationship" value={application.relation} />
+          </>
+        ) : (
+          <Detail label="Applicant" value={application.name} />
+        )}
+        <div>
+          <dt className="text-xs text-muted-foreground">Phone</dt>
+          <dd className="mt-0.5 inline-flex items-center gap-1.5">
+            <Phone className="size-3.5 text-primary" />
+            <a href={`tel:${application.phone}`} className="hover:text-primary">
+              {application.phone}
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Email</dt>
+          <dd className="mt-0.5 inline-flex min-w-0 items-center gap-1.5">
+            <Mail className="size-3.5 shrink-0 text-primary" />
+            <a href={`mailto:${application.email}`} className="truncate hover:text-primary">
+              {application.email}
+            </a>
+          </dd>
+        </div>
+        <div className="sm:col-span-2">
+          <dt className="text-xs text-muted-foreground">Message</dt>
+          <dd className="mt-0.5 whitespace-pre-wrap break-words">
+            {application.message || "No message provided"}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  );
+}
+
+function Detail({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5">{value || "Not provided"}</dd>
+    </div>
   );
 }

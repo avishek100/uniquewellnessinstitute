@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -35,34 +35,40 @@
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-sand: var(--sand);
+  --color-button-neutral: var(--button-neutral);
+  --color-button-neutral-foreground: var(--button-neutral-foreground);
   --shadow-card: 0 1px 2px oklch(0.25 0.05 265 / 6%), 0 12px 32px oklch(0.25 0.05 265 / 8%);
   --shadow-lift: 0 18px 50px oklch(0.25 0.05 265 / 14%);
 }
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.982 0.005 250);
-  --foreground: oklch(0.24 0.05 265);
+  --background: oklch(0.99 0.006 100);
+  --foreground: oklch(0.23 0.025 145);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.24 0.05 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.05 265);
-  --primary: oklch(0.27 0.07 265);
-  --primary-foreground: oklch(0.98 0.005 250);
-  --secondary: oklch(0.94 0.012 250);
-  --secondary-foreground: oklch(0.3 0.07 265);
-  --muted: oklch(0.95 0.008 250);
-  --muted-foreground: oklch(0.5 0.03 260);
-  --accent: oklch(0.52 0.09 250);
-  --accent-foreground: oklch(0.98 0.005 250);
+  --popover-foreground: oklch(0.23 0.025 145);
+  --primary: oklch(0.48 0.12 138);
+  --primary-foreground: oklch(0.99 0.006 100);
+  --secondary: oklch(0.95 0.025 138);
+  --secondary-foreground: oklch(0.29 0.055 140);
+  --muted: oklch(0.96 0.008 105);
+  --muted-foreground: oklch(0.48 0.018 145);
+  --accent: oklch(0.68 0.14 48);
+  --accent-foreground: oklch(0.24 0.035 48);
+  --button-neutral: #5f5f5f;
+  --button-neutral-foreground: #ffffff;
+  --button-cta: var(--button-neutral);
+  --button-cta-foreground: var(--button-neutral-foreground);
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(0.98 0.01 95);
-  --border: oklch(0.91 0.012 250);
-  --input: oklch(0.89 0.015 250);
-  --ring: oklch(0.52 0.09 250);
-  --ink: oklch(0.94 0.018 250);
-  --ink-foreground: oklch(0.24 0.06 265);
-  --sand: oklch(0.955 0.012 250);
+  --border: oklch(0.9 0.014 135);
+  --input: oklch(0.88 0.018 135);
+  --ring: oklch(0.48 0.12 138);
+  --ink: oklch(0.95 0.025 138);
+  --ink-foreground: oklch(0.23 0.025 145);
+  --sand: oklch(0.96 0.022 95);
 }
 
 @layer base {
@@ -119,10 +125,11 @@
 
 @utility btn-primary {
   @apply btn-base;
-  background-color: var(--color-primary);
-  color: var(--color-primary-foreground);
+  background-color: var(--button-neutral);
+  color: var(--button-neutral-foreground);
   box-shadow: var(--shadow-card);
 }
+
 @utility btn-primary {
   &:hover {
     transform: translateY(-2px);
@@ -132,9 +139,10 @@
 
 @utility btn-gold {
   @apply btn-base;
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: var(--button-cta);
+  color: var(--button-cta-foreground);
 }
+
 @utility btn-gold {
   &:hover {
     transform: translateY(-2px);
@@ -148,6 +156,7 @@
   background-color: var(--color-card);
   color: var(--color-foreground);
 }
+
 @utility btn-outline {
   &:hover {
     background-color: var(--color-secondary);
@@ -170,6 +179,7 @@
   font-size: 0.95rem;
   outline: none;
 }
+
 @utility field {
   &:focus {
     border-color: var(--color-primary);

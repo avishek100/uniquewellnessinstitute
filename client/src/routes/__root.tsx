@@ -70,11 +70,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Unique Wellness Institute — Online Chess Academy" },
+      { title: "Unique Wellness Institute — Chess, Career & Wellness" },
       {
         name: "description",
         content:
-          "Professional online chess coaching for children aged 5–16. Live interactive courses of 16 sessions, small groups and tournament preparation.",
+          "International chess coaching, career guidance and wellness plans from Unique Wellness Institute. Explore programs and book a consultation.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/logo.png", type: "image/png" },
     ],

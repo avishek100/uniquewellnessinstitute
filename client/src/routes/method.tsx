@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 
-import onlineLesson from "@/assets/online-lesson.jpg";
+import onlineLesson from "@/assets/online-lesson.png";
 
 export const Route = createFileRoute("/method")({
   head: () => ({
