@@ -14,11 +14,12 @@ export function setSessionCookie(response: Response, userId: string): boolean {
     const secret = process.env.JWT_SECRET;
     if (!secret || secret.length < 32) return false;
 
+    const isProduction = process.env.NODE_ENV === "production";
     const token = jwt.sign({ sub: userId }, secret, { expiresIn: "7d" });
     response.cookie(sessionCookieName, token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
         maxAge: sessionDurationMs,
     });
@@ -30,6 +31,7 @@ export function setAdminSessionCookie(response: Response, email: string): boolea
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (!secret || secret.length < 32 || !adminPassword) return false;
 
+    const isProduction = process.env.NODE_ENV === "production";
     const credentialVersion = createHmac("sha256", secret).update(adminPassword).digest("hex");
     const token = jwt.sign(
         { sub: email, role: "admin", email, credentialVersion },
@@ -38,8 +40,8 @@ export function setAdminSessionCookie(response: Response, email: string): boolea
     );
     response.cookie(sessionCookieName, token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
         maxAge: sessionDurationMs,
     });
@@ -83,10 +85,11 @@ export function getAdminSession(token: string | undefined): { email: string } | 
 }
 
 export function clearSessionCookie(response: Response): void {
+    const isProduction = process.env.NODE_ENV === "production";
     response.clearCookie(sessionCookieName, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
     });
 }
