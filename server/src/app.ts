@@ -4,8 +4,8 @@ import express from "express";
 import mongoose from "mongoose";
 import { adminRouter } from "./routes/admin.js";
 import { applicationsRouter } from "./routes/applications.js";
-import { chatRouter } from "./routes/chat.js";
 import { authRouter } from "./routes/auth.js";
+import { chatRouter } from "./routes/chat.js";
 
 export function isAllowedOrigin(origin?: string): boolean {
     const configuredOrigins = process.env.CLIENT_ORIGIN
@@ -22,6 +22,7 @@ export function isAllowedOrigin(origin?: string): boolean {
 
 export function createApp() {
     const app = express();
+    app.set("trust proxy", 1);
 
     app.use(
         cors({
