@@ -4,10 +4,8 @@ import {
   Award,
   BrainCircuit,
   BriefcaseBusiness,
-  Check,
   Gamepad2,
   GraduationCap,
-  HeartPulse,
   Laptop,
   MonitorSmartphone,
   Star,
@@ -17,27 +15,26 @@ import {
 } from "lucide-react";
 
 import onlineLesson from "@/assets/online-lesson.png";
-import piecesDetail from "@/assets/pieces-detail.jpg";
 import { ApplicationForm } from "@/components/site/ApplicationForm";
 import { chessCourses } from "@/lib/chess-courses";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Unique Wellness Institute — Chess, Career & Wellness" },
+      { title: "Unique Wellness Institute — Chess & Career Guidance" },
       {
         name: "description",
         content:
-          "International chess coaching, career guidance and wellness plans from Unique Wellness Institute. Explore programs and book a consultation.",
+          "International chess coaching and career guidance from Unique Wellness Institute. Explore programs and book a consultation.",
       },
       {
         property: "og:title",
-        content: "Unique Wellness Institute — Chess, Career & Wellness",
+        content: "Unique Wellness Institute — Chess & Career Guidance",
       },
       {
         property: "og:description",
         content:
-          "Chess, career guidance and wellness — delivered with care and backed by decades of international experience.",
+          "Chess coaching and career guidance, delivered with care and backed by decades of international experience.",
       },
     ],
   }),
@@ -129,14 +126,14 @@ function Home() {
         <div className="container-page grid gap-12 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:py-24">
           <div>
             <span className="eyebrow text-primary">
-              Chess · Career Guidance · Wellness — all under one roof
+              Chess · Career Guidance — all under one roof
             </span>
-            <h1 className="mt-5 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 motion-reduce:animate-none text-5xl leading-[0.98] sm:text-6xl lg:text-7xl uppercase">
+            <h1 className="hero-heading-fade mt-5 max-w-2xl text-5xl leading-[0.98] sm:text-6xl lg:text-7xl uppercase">
               Grow with <span className="text-primary">international coaching</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-foreground/75">
-              Unique Wellness Institute pairs world-class chess coaching with career mentorship and
-              wellness — built on decades of cross-industry experience.
+              Unique Wellness Institute pairs world-class chess coaching with career mentorship,
+              built on decades of cross-industry experience.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/contact" className="btn-gold">
@@ -195,12 +192,12 @@ function Home() {
       <section id="services" className="container-page scroll-mt-24 py-20">
         <div className="max-w-2xl">
           <span className="eyebrow">What we offer</span>
-          <h2 className="mt-4 text-3xl sm:text-4xl">Three pillars. One institute.</h2>
+          <h2 className="mt-4 text-3xl sm:text-4xl">Two specialties. One institute.</h2>
           <p className="mt-4 text-muted-foreground">
-            Chess, career, and wellness — guided by experience and delivered with care.
+            Chess and career guidance, backed by experience and delivered with care.
           </p>
         </div>
-        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 lg:grid-cols-2">
           <article className="card-soft flex flex-col p-6 sm:p-7">
             <Trophy className="size-6 text-primary" />
             <p className="mt-5 text-xs font-semibold uppercase text-primary">Chess Mastery</p>
@@ -230,21 +227,6 @@ function Home() {
               className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
             >
               Learn more <ArrowRight className="size-4" />
-            </Link>
-          </article>
-          <article className="card-soft flex flex-col p-6 sm:p-7">
-            <HeartPulse className="size-6 text-primary" />
-            <p className="mt-5 text-xs font-semibold uppercase text-primary">Wellness</p>
-            <h3 className="mt-2 text-2xl">Diet &amp; Exercise Plans</h3>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-              Sustainable diet and workout plans built around your routine, with regular check-ins
-              to help you stay on track.
-            </p>
-            <Link
-              to="/contact"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
-            >
-              Get started <ArrowRight className="size-4" />
             </Link>
           </article>
         </div>
@@ -334,75 +316,6 @@ function Home() {
         </div>
       </section>
 
-      <section
-        id="about"
-        className="container-page scroll-mt-24 grid gap-14 py-20 lg:grid-cols-[1.15fr_1fr]"
-      >
-        <div>
-          <span className="eyebrow">About us</span>
-          <h2 className="mt-4 text-3xl sm:text-4xl">Built on experience, driven by passion.</h2>
-          <div className="mt-6 space-y-5 text-[1.02rem] leading-relaxed text-muted-foreground">
-            <p>
-              Unique Wellness Institute combines international chess coaching, career mentorship,
-              and wellness guidance under one roof. Led by experienced coach Mr. Vivek Rane, the
-              academy supports students from their first game through advanced tournament play.
-            </p>
-            <p>
-              Each course consists of 16 live, interactive sessions designed to develop tactical
-              skills, strategic thinking, calculation, confidence and a deeper understanding of the
-              game. Students benefit from personalised feedback, progress tracking, small-group
-              instruction and focused preparation for competitive and FIDE-rated tournaments.
-            </p>
-            <p>
-              With a supportive environment, Unique Wellness Institute helps every student improve
-              consistently, enjoy chess and reach their full potential.
-            </p>
-          </div>
-
-          <figure className="mt-8 rounded-2xl border-l-4 border-accent bg-sand/60 p-6">
-            <blockquote className="text-sm leading-relaxed text-foreground/85">
-              Originally from the airlines industry and part of service at the Saudi King&apos;s
-              palace three times, Mrunal served kings and presidents worldwide. Since coaching was a
-              passion, Mrunal decided to focus on it fully and provide online chess coaching, career
-              counselling and personality development globally.
-            </blockquote>
-          </figure>
-        </div>
-
-        <div className="space-y-6">
-          <div className="card-soft overflow-hidden">
-            <img
-              src={piecesDetail}
-              alt="Chess knight and pawn"
-              width={1200}
-              height={912}
-              loading="lazy"
-              className="h-44 w-full object-cover"
-            />
-            <div className="p-6">
-              <h3 className="text-xl">Mrunal Kore</h3>
-              <p className="text-sm text-muted-foreground">Owner &amp; head coach</p>
-              <ul className="mt-4 space-y-3 text-sm">
-                {[
-                  "Chess, career and personality development coach",
-                  "Worked with seven-time world champion Viswanathan Anand as a Business Head",
-                  "International trainer in chess, personal development and global employment",
-                  "Committed to high-quality training at affordable prices",
-                ].map((item) => (
-                  <li key={item} className="flex gap-2.5">
-                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/contact" className="btn-primary mt-6 w-full">
-                Schedule a lesson
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="bg-secondary/50 py-20">
         <div className="container-page">
           <span className="eyebrow">Benefits</span>
@@ -458,7 +371,7 @@ function Home() {
               Start with a conversation. Grow from there.
             </h2>
             <p className="mt-3 text-sm text-primary-foreground/75">
-              Book a free demo class or speak with us about career and wellness guidance.
+              Book a free demo class or speak with us about career guidance.
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">

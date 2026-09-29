@@ -15,6 +15,3 @@ export const loginInputSchema = z.object({
     password: z.string().min(1).max(128),
 });
 
-export const googleInputSchema = z.object({
-    credential: z.string().min(1),
-});

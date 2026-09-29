@@ -2,6 +2,30 @@
 @source "../src";
 @import "tw-animate-css";
 
+@keyframes hero-heading-fade {
+
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .hero-heading-fade {
+    animation: hero-heading-fade 4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-heading-fade {
+      animation: none;
+    }
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -35,8 +59,8 @@
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-sand: var(--sand);
-  --color-button-neutral: var(--button-neutral);
-  --color-button-neutral-foreground: var(--button-neutral-foreground);
+  --color-button-green: var(--button-green);
+  --color-button-green-foreground: var(--button-green-foreground);
   --shadow-card: 0 1px 2px oklch(0.25 0.05 265 / 6%), 0 12px 32px oklch(0.25 0.05 265 / 8%);
   --shadow-lift: 0 18px 50px oklch(0.25 0.05 265 / 14%);
 }
@@ -57,10 +81,10 @@
   --muted-foreground: oklch(0.48 0.018 145);
   --accent: oklch(0.68 0.14 48);
   --accent-foreground: oklch(0.24 0.035 48);
-  --button-neutral: #5f5f5f;
-  --button-neutral-foreground: #ffffff;
-  --button-cta: var(--button-neutral);
-  --button-cta-foreground: var(--button-neutral-foreground);
+  --button-green: oklch(0.72 0.16 122);
+  --button-green-foreground: oklch(1 0 0);
+  --button-cta: var(--button-green);
+  --button-cta-foreground: var(--button-green-foreground);
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(0.98 0.01 95);
   --border: oklch(0.9 0.014 135);
@@ -125,8 +149,8 @@
 
 @utility btn-primary {
   @apply btn-base;
-  background-color: var(--button-neutral);
-  color: var(--button-neutral-foreground);
+  background-color: var(--button-green);
+  color: var(--button-green-foreground);
   box-shadow: var(--shadow-card);
 }
 

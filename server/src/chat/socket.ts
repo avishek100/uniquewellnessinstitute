@@ -1,13 +1,13 @@
-import type { Server as HttpServer } from "node:http";
 import { parseCookie } from "cookie";
+import type { Server as HttpServer } from "node:http";
 import { Server } from "socket.io";
 import { isAllowedOrigin } from "../app.js";
-import { isAdminEmail } from "../middleware/requireAdmin.js";
 import { ChatConversation } from "../models/ChatConversation.js";
 import { ChatMessage } from "../models/ChatMessage.js";
+import { SupportConversation } from "../models/SupportConversation.js";
 import { User } from "../models/User.js";
 import { hashChatAccessToken } from "../utils/chatAccess.js";
-import { getSessionUserId, sessionCookieName } from "../utils/session.js";
+import { getAdminSession, getSessionUserId, sessionCookieName } from "../utils/session.js";
 
 type ChatActor =
     | { type: "admin"; name: string }
@@ -40,7 +40,11 @@ export function attachChatSocket(httpServer: HttpServer): void {
                     acknowledge?.({ ok: false, message: "Chat access is invalid." });
                     return;
                 }
-                if (!(await ChatConversation.exists({ _id: conversationId }))) {
+                const applicationConversation = await ChatConversation.exists({ _id: conversationId });
+                const supportConversation = applicationConversation
+                    ? null
+                    : await SupportConversation.exists({ _id: conversationId });
+                if (!applicationConversation && !supportConversation) {
                     acknowledge?.({ ok: false, message: "Conversation not found." });
                     return;
                 }
@@ -72,7 +76,11 @@ export function attachChatSocket(httpServer: HttpServer): void {
                     return;
                 }
 
-                const conversation = await ChatConversation.findById(conversationId);
+                const applicationConversation = await ChatConversation.findById(conversationId);
+                const supportConversation = applicationConversation
+                    ? null
+                    : await SupportConversation.findById(conversationId);
+                const conversation = applicationConversation ?? supportConversation;
                 if (!conversation) {
                     acknowledge?.({ ok: false, message: "Conversation not found." });
                     return;
@@ -101,6 +109,7 @@ export function attachChatSocket(httpServer: HttpServer): void {
                     conversationId,
                     visitorName: conversation.visitorName,
                     visitorEmail: conversation.visitorEmail,
+                    type: supportConversation ? "support" : "application",
                     lastMessage: result,
                     lastMessageAt: message.createdAt,
                 });
@@ -119,14 +128,18 @@ async function authenticateSocket(
 ): Promise<void> {
     try {
         const cookies = parseCookie(socket.handshake.headers.cookie ?? "");
+        const admin = getAdminSession(cookies[sessionCookieName]);
+        if (admin) {
+            socket.data.actor = { type: "admin", name: "Administration" } satisfies ChatActor;
+            next();
+            return;
+        }
+
         const userId = getSessionUserId(cookies[sessionCookieName]);
-        if (userId) {
-            const user = await User.findById(userId).select("fullName email");
-            if (user && isAdminEmail(user.email)) {
-                socket.data.actor = { type: "admin", name: user.fullName } satisfies ChatActor;
-                next();
-                return;
-            }
+        const user = userId ? await User.findById(userId).select("fullName") : null;
+        if (!user) {
+            next(new Error("Please sign in before chatting."));
+            return;
         }
 
         const { conversationId, chatToken } = socket.handshake.auth as {
@@ -142,18 +155,28 @@ async function authenticateSocket(
             return;
         }
 
-        const conversation = await ChatConversation.findOne({
+        const conversationQuery = {
             _id: conversationId,
             accessTokenHash: hashChatAccessToken(chatToken),
-        });
+        };
+        const conversation = await ChatConversation.findOne(conversationQuery) ??
+            await SupportConversation.findOne(conversationQuery).select("+accessTokenHash");
         if (!conversation) {
             next(new Error("Unauthorized chat connection."));
+            return;
+        }
+        if (
+            conversation instanceof SupportConversation &&
+            conversation.visitorUserId &&
+            String(conversation.visitorUserId) !== userId
+        ) {
+            next(new Error("This chat belongs to another account."));
             return;
         }
 
         socket.data.actor = {
             type: "visitor",
-            name: conversation.visitorName,
+            name: user.fullName,
             conversationId,
         } satisfies ChatActor;
         next();

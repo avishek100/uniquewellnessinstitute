@@ -1,13 +1,12 @@
-import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from "@react-oauth/google";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 type AuthResponse = {
   message?: string;
+  isAdmin?: boolean;
   user?: { fullName: string; email: string };
 };
 
@@ -50,32 +49,20 @@ function AuthPage() {
     setIsSubmitting(true);
     try {
       const result = await requestAuth(mode === "signup" ? "signup" : "login", payload);
-      toast.success(mode === "signup" ? "Account created" : "Welcome back", {
-        description: result.user?.fullName,
-      });
-      await navigate({ to: "/" });
+      const signedInAsAdmin = result.isAdmin === true;
+      toast.success(
+        signedInAsAdmin
+          ? "Admin signed in"
+          : mode === "signup"
+            ? "Account created"
+            : "Welcome back",
+        {
+          description: result.user?.fullName,
+        },
+      );
+      await navigate({ to: signedInAsAdmin ? "/admin" : "/" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Account request failed.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  async function handleGoogleSuccess(credentialResponse: CredentialResponse) {
-    if (!credentialResponse.credential) {
-      toast.error("Google sign-in did not return a credential.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await requestAuth("google", {
-        credential: credentialResponse.credential,
-      });
-      toast.success("Signed in with Google", { description: result.user?.fullName });
-      await navigate({ to: "/" });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Google sign-in failed.");
     } finally {
       setIsSubmitting(false);
     }
@@ -90,26 +77,6 @@ function AuthPage() {
             ? "Sign in to your Unique Wellness Institute account."
             : "Create an account to get started with your chess lessons."}
         </p>
-
-        {googleClientId ? (
-          <div className="mt-6 flex justify-center" aria-busy={isSubmitting}>
-            <GoogleOAuthProvider clientId={googleClientId}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => toast.error("Google sign-in failed. Please try again.")}
-                text="continue_with"
-                shape="rectangular"
-              />
-            </GoogleOAuthProvider>
-          </div>
-        ) : (
-          <p role="status" className="mt-6 border border-accent bg-accent/20 px-4 py-3 text-sm">
-            Google sign-in needs `VITE_GOOGLE_CLIENT_ID` in the client environment.
-          </p>
-        )}
-        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
 
         <form className="grid gap-4" onSubmit={handleSubmit}>
           {mode === "signup" && (
@@ -165,7 +132,7 @@ function AuthPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-center text-sm text-muted-foreground">
           {mode === "login" ? "New here?" : "Already have an account?"}{" "}
           <button
             type="button"

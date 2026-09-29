@@ -13,8 +13,8 @@ export function SiteFooter() {
             />
           </Link>
           <p className="mt-5 max-w-xl text-sm leading-7 text-muted-foreground">
-            Premium institute for chess coaching, career counseling, and wellness — built on decades
-            of international experience.
+            Premium institute for chess coaching and career counseling, built on decades of
+            international experience.
           </p>
         </div>
 
@@ -32,12 +32,12 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:text-primary">
-                Wellness Plans
+              <Link to="/about" className="hover:text-primary">
+                About Us
               </Link>
             </li>
             <li>
-              <Link to="/" hash="about" className="hover:text-primary">
+              <Link to="/founders" className="hover:text-primary">
                 Founder
               </Link>
             </li>

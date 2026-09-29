@@ -1,4 +1,5 @@
-import { Send } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io, type Socket } from "socket.io-client";
 
@@ -17,9 +18,18 @@ type ChatPanelProps = {
   mode: "visitor" | "admin";
   chatToken?: string;
   visitorName?: string;
+  floating?: boolean;
+  onClose?: () => void;
 };
 
-export function ApplicationChat({ conversationId, mode, chatToken, visitorName }: ChatPanelProps) {
+export function ApplicationChat({
+  conversationId,
+  mode,
+  chatToken,
+  visitorName,
+  floating = false,
+  onClose,
+}: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState("Connecting...");
@@ -79,11 +89,24 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
         if (result?.ok) void loadMessages();
       });
     });
-    socket.on("connect_error", () => {
-      if (active) setStatus("Reconnecting...");
+    socket.on("connect_error", (connectError) => {
+      if (!active) return;
+      if (connectError.message.includes("sign in")) {
+        setStatus("Sign in required");
+        setError("Sign in before sending messages.");
+        socket.disconnect();
+        return;
+      }
+      setStatus("Reconnecting...");
     });
     socket.on("chat:message", (message: ChatMessage) => {
-      if (active) setMessages((current) => [...current, message]);
+      if (active) {
+        setMessages((current) =>
+          current.some((existing) => existing._id === message._id)
+            ? current
+            : [...current, message],
+        );
+      }
     });
 
     return () => {
@@ -114,7 +137,13 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
   }
 
   return (
-    <section className="card-soft flex min-h-[25rem] flex-col p-5 sm:p-6">
+    <section
+      className={
+        floating
+          ? "flex h-full min-h-0 flex-col p-4"
+          : "card-soft flex min-h-[25rem] flex-col p-5 sm:p-6"
+      }
+    >
       <header className="flex items-start justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-lg font-semibold">
@@ -124,9 +153,19 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
             {status}
           </p>
         </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid size-9 shrink-0 place-items-center text-muted-foreground hover:bg-muted hover:text-foreground"
+            aria-label="Close chat"
+          >
+            <X className="size-4" />
+          </button>
+        )}
       </header>
 
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto py-4" aria-live="polite">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto py-4" aria-live="polite">
         {messages.length === 0 && !error && (
           <p className="my-auto text-center text-sm text-muted-foreground">
             Send a message to start the conversation.
@@ -137,11 +176,12 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
           return (
             <article
               key={message._id}
-              className={`max-w-[88%] px-3 py-2 ${
-                isOwnMessage ? "self-end bg-primary text-primary-foreground" : "self-start bg-muted"
-              }`}
+              className={`max-w-[88%] px-3 py-2 ${isOwnMessage ? "self-end bg-primary text-primary-foreground" : "self-start bg-muted"
+                }`}
             >
-              <p className="text-[11px] font-semibold">{message.senderName}</p>
+              <p className="text-[11px] font-semibold">
+                {message.sender === "admin" ? "Administration" : message.senderName}
+              </p>
               <p className="mt-1 whitespace-pre-wrap break-words text-sm">{message.body}</p>
               <time className="mt-1 block text-right text-[10px] opacity-70">
                 {new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(
@@ -151,7 +191,16 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
             </article>
           );
         })}
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && (
+          <p className="text-sm text-destructive" role="alert">
+            {error}{" "}
+            {error.includes("Sign in") && (
+              <Link to="/auth" className="font-semibold underline">
+                Sign in
+              </Link>
+            )}
+          </p>
+        )}
         <div ref={endRef} />
       </div>
 
@@ -167,6 +216,12 @@ export function ApplicationChat({ conversationId, mode, chatToken, visitorName }
           maxLength={2000}
           placeholder="Write a message..."
           rows={1}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
         />
         <button
           className="btn-primary grid size-11 shrink-0 place-items-center p-0"

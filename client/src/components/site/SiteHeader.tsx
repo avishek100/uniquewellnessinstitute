@@ -4,10 +4,9 @@ import { useState } from "react";
 
 const nav = [
   { to: "/prices", label: "Chess Coaching" },
-  { to: "/", hash: "services", label: "Career Guidance" },
-  { to: "/", hash: "services", label: "Wellness" },
-  { to: "/", hash: "about", label: "Founder" },
-  { to: "/", hash: "about", label: "About" },
+  { to: "/about", hash: "career", label: "Career Guidance" },
+  { to: "/founders", label: "Founder" },
+  { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -28,7 +27,7 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-5 xl:flex">
           {nav.map((item) => (
             <Link
-              key={item.to}
+              key={`${item.to}:${item.label}`}
               to={item.to}
               hash={item.hash}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
@@ -62,7 +61,7 @@ export function SiteHeader() {
           <div className="container-page flex flex-col gap-1 py-4">
             {nav.map((item) => (
               <Link
-                key={item.to}
+                key={`${item.to}:${item.label}`}
                 to={item.to}
                 hash={item.hash}
                 onClick={() => setOpen(false)}

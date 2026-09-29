@@ -1,21 +1,21 @@
 import bcrypt from "bcryptjs";
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { OAuth2Client } from "google-auth-library";
 import mongoose from "mongoose";
+import { timingSafeEqual } from "node:crypto";
 import { User } from "../models/User.js";
-import { googleInputSchema, loginInputSchema, signupInputSchema } from "../schemas/auth.js";
+import { loginInputSchema, signupInputSchema } from "../schemas/auth.js";
 import {
     clearSessionCookie,
     getSessionUserId,
     isSessionConfigured,
     sessionCookieName,
+    setAdminSessionCookie,
     setSessionCookie,
 } from "../utils/session.js";
 
 export const authRouter = Router();
 
-const googleClient = new OAuth2Client();
 const authRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 20,
@@ -75,6 +75,20 @@ authRouter.post("/login", async (request, response) => {
         response.status(503).json({ message: "Account services are not configured." });
         return;
     }
+
+    const adminLogin = checkAdminCredentials(parsed.data.email, parsed.data.password);
+    if (adminLogin.status === "not-configured") {
+        response.status(503).json({ message: "Admin access is not configured." });
+        return;
+    }
+    if (adminLogin.status === "valid") {
+        setAdminSessionCookie(response, adminLogin.email);
+        response.json({
+            user: { fullName: "Administrator", email: adminLogin.email },
+            isAdmin: true,
+        });
+        return;
+    }
     if (mongoose.connection.readyState !== 1) {
         response.status(503).json({ message: "Account services are temporarily unavailable." });
         return;
@@ -93,57 +107,6 @@ authRouter.post("/login", async (request, response) => {
     } catch (error) {
         console.error("Could not log in:", error);
         response.status(500).json({ message: "Could not log in." });
-    }
-});
-
-authRouter.post("/google", async (request, response) => {
-    const parsed = googleInputSchema.safeParse(request.body);
-    if (!parsed.success) {
-        response.status(400).json({ message: "Google sign-in did not return a credential." });
-        return;
-    }
-    if (!process.env.GOOGLE_CLIENT_ID || !isSessionConfigured()) {
-        response.status(503).json({ message: "Google sign-in is not configured." });
-        return;
-    }
-    if (mongoose.connection.readyState !== 1) {
-        response.status(503).json({ message: "Account services are temporarily unavailable." });
-        return;
-    }
-
-    try {
-        const ticket = await googleClient.verifyIdToken({
-            idToken: parsed.data.credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-        const googleProfile = ticket.getPayload();
-        if (!googleProfile?.sub || !googleProfile.email || googleProfile.email_verified !== true) {
-            response.status(401).json({ message: "Google could not verify this account." });
-            return;
-        }
-
-        const email = googleProfile.email.toLowerCase();
-        let user = await User.findOne({ email });
-        if (user) {
-            if (user.googleId && user.googleId !== googleProfile.sub) {
-                response.status(409).json({ message: "This email is linked to another Google account." });
-                return;
-            }
-            user.googleId = googleProfile.sub;
-            await user.save();
-        } else {
-            user = await User.create({
-                fullName: googleProfile.name?.trim() || email.split("@")[0],
-                email,
-                googleId: googleProfile.sub,
-            });
-        }
-
-        setSessionCookie(response, user.id);
-        response.json({ user: toPublicUser(user) });
-    } catch (error) {
-        console.error("Could not verify Google sign-in:", error);
-        response.status(401).json({ message: "Google sign-in could not be verified." });
     }
 });
 
@@ -184,6 +147,30 @@ function toPublicUser(user: InstanceType<typeof User>) {
         email: user.email,
         phone: user.phone,
     };
+}
+
+function checkAdminCredentials(
+    email: string,
+    password: string,
+): { status: "not-admin" | "not-configured" } | { status: "valid"; email: string } {
+    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    if (!adminEmail || email !== adminEmail) return { status: "not-admin" };
+
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword || Buffer.byteLength(adminPassword) > 128) {
+        return { status: "not-configured" };
+    }
+
+    const submittedPassword = Buffer.from(password);
+    const configuredPassword = Buffer.from(adminPassword);
+    if (
+        submittedPassword.length !== configuredPassword.length ||
+        !timingSafeEqual(submittedPassword, configuredPassword)
+    ) {
+        return { status: "not-admin" };
+    }
+
+    return { status: "valid", email: adminEmail };
 }
 
 function isDuplicateKeyError(error: unknown): boolean {

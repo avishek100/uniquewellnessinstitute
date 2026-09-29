@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { FloatingChatWidget } from "../components/site/FloatingChatWidget";
 import { SiteFooter } from "../components/site/SiteFooter";
 import { SiteHeader } from "../components/site/SiteHeader";
 import { Toaster } from "../components/ui/sonner";
@@ -70,11 +71,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Unique Wellness Institute — Chess, Career & Wellness" },
+      { title: "Unique Wellness Institute — Chess & Career Guidance" },
       {
         name: "description",
         content:
-          "International chess coaching, career guidance and wellness plans from Unique Wellness Institute. Explore programs and book a consultation.",
+          "International chess coaching and career guidance from Unique Wellness Institute. Explore programs and book a consultation.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -123,6 +124,7 @@ function RootComponent() {
         </main>
         <SiteFooter />
       </div>
+      <FloatingChatWidget />
       <Toaster />
     </QueryClientProvider>
   );

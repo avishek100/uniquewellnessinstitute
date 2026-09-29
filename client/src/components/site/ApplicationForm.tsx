@@ -1,3 +1,4 @@
+import { saveVisitorChatSession } from "@/lib/visitor-chat";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { ApplicationChat } from "./ApplicationChat";
@@ -55,6 +56,11 @@ export function ApplicationForm() {
       });
       const name = String(payload.parentName ?? payload.name ?? payload.childName ?? "Applicant");
       if (result.conversationId && result.chatToken) {
+        saveVisitorChatSession({
+          conversationId: result.conversationId,
+          chatToken: result.chatToken,
+          visitorName: name,
+        });
         setConversation({ id: result.conversationId, token: result.chatToken, visitorName: name });
       }
       form.reset();

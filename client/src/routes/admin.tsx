@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw } from "lucide-react";
-import { io } from "socket.io-client";
 import { ApplicationChat } from "@/components/site/ApplicationChat";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
@@ -22,6 +22,7 @@ type Application = {
 
 type Conversation = {
   _id: string;
+  type?: "application" | "support";
   visitorName: string;
   visitorEmail: string;
   lastMessageAt: string;
@@ -33,10 +34,21 @@ type Conversation = {
   };
 };
 
+class AdminRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
 async function getAdminData<T>(path: string): Promise<T> {
   const response = await fetch(`${apiUrl}/api/admin/${path}`, { credentials: "include" });
   const result = (await response.json().catch(() => ({}))) as T & { message?: string };
-  if (!response.ok) throw new Error(result.message ?? "Could not load admin data.");
+  if (!response.ok) {
+    throw new AdminRequestError(result.message ?? "Could not load admin data.", response.status);
+  }
   return result;
 }
 
@@ -51,12 +63,15 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
+  const [activeSection, setActiveSection] = useState<"applications" | "messages">("applications");
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState("");
+  const [conversationSearch, setConversationSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
@@ -88,6 +103,13 @@ function AdminPage() {
         });
       } catch (loadError) {
         if (active) {
+          if (
+            loadError instanceof AdminRequestError &&
+            (loadError.status === 401 || loadError.status === 403)
+          ) {
+            void navigate({ to: "/auth" });
+            return;
+          }
           setError(loadError instanceof Error ? loadError.message : "Could not load admin data.");
         }
       } finally {
@@ -100,11 +122,20 @@ function AdminPage() {
       active = false;
       socket?.disconnect();
     };
-  }, [reloadKey]);
+  }, [navigate, reloadKey]);
 
   const selectedConversation = conversations.find(
     (conversation) => conversation._id === selectedConversationId,
   );
+  const filteredConversations = conversations.filter((conversation) => {
+    const query = conversationSearch.trim().toLowerCase();
+    return (
+      !query ||
+      conversation.visitorName.toLowerCase().includes(query) ||
+      conversation.visitorEmail.toLowerCase().includes(query) ||
+      conversation.lastMessage?.body.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <section className="container-page py-10 sm:py-14">
@@ -132,95 +163,160 @@ function AdminPage() {
           <p className="font-semibold">Admin access unavailable</p>
           <p className="mt-1 text-sm text-muted-foreground">{error}</p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in with the account listed in the server&apos;s <code>ADMIN_EMAILS</code> setting.
+            Check the server&apos;s <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code>{" "}
+            settings.
           </p>
-          <Link to="/auth" className="btn-primary mt-4 inline-flex">
-            Go to sign in
-          </Link>
         </div>
       ) : (
-        <div className="grid gap-10 pt-8 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]">
-          <section aria-labelledby="applications-heading">
-            <div className="mb-4 flex items-end justify-between gap-4">
-              <div>
-                <span className="eyebrow">Applications</span>
-                <h2 id="applications-heading" className="mt-2 text-2xl">
-                  Submitted applications
-                </h2>
+        <>
+          <div
+            className="mt-6 flex gap-1 border-b border-border"
+            role="tablist"
+            aria-label="Admin sections"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "applications"}
+              onClick={() => setActiveSection("applications")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "applications"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Applications <span className="ml-1.5 text-xs">{applications.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "messages"}
+              onClick={() => setActiveSection("messages")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "messages"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Messages <span className="ml-1.5 text-xs">{conversations.length}</span>
+            </button>
+          </div>
+
+          {activeSection === "applications" ? (
+            <section className="pt-8" aria-labelledby="applications-heading" role="tabpanel">
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <span className="eyebrow">Applications</span>
+                  <h2 id="applications-heading" className="mt-2 text-2xl">
+                    Submitted applications
+                  </h2>
+                </div>
+                <span className="text-sm text-muted-foreground" aria-live="polite">
+                  {applications.length} total
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground" aria-live="polite">
-                {applications.length} total
-              </span>
-            </div>
 
-            {isLoading ? (
-              <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                Loading applications...
-              </p>
-            ) : applications.length ? (
-              <div className="divide-y divide-border border-y border-border">
-                {applications.map((application) => (
-                  <ApplicationDetails key={application._id} application={application} />
-                ))}
-              </div>
-            ) : (
-              <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                No applications have been submitted yet.
-              </p>
-            )}
-          </section>
-
-          <section aria-labelledby="chat-heading" className="min-w-0">
-            <div className="mb-4">
-              <span className="eyebrow">Live support</span>
-              <h2 id="chat-heading" className="mt-2 text-2xl">
-                Applicant conversations
-              </h2>
-            </div>
-
-            {conversations.length ? (
-              <div className="grid gap-5 lg:grid-cols-[minmax(10rem,0.7fr)_minmax(0,1.3fr)] xl:grid-cols-1 2xl:grid-cols-[minmax(10rem,0.7fr)_minmax(0,1.3fr)]">
-                <div className="max-h-[28rem] divide-y divide-border overflow-y-auto border-y border-border">
-                  {conversations.map((conversation) => (
-                    <button
-                      key={conversation._id}
-                      type="button"
-                      onClick={() => setSelectedConversationId(conversation._id)}
-                      aria-pressed={conversation._id === selectedConversationId}
-                      className={`block w-full px-3 py-3 text-left transition-colors hover:bg-muted ${
-                        conversation._id === selectedConversationId ? "bg-muted" : ""
-                      }`}
-                    >
-                      <span className="flex items-center gap-2 text-sm font-semibold">
-                        <MessageCircle className="size-4 shrink-0 text-primary" />
-                        <span className="truncate">{conversation.visitorName}</span>
-                      </span>
-                      <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
-                        {conversation.lastMessage?.body ?? conversation.visitorEmail}
-                      </span>
-                    </button>
+              {isLoading ? (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  Loading applications...
+                </p>
+              ) : applications.length ? (
+                <div className="divide-y divide-border border-y border-border">
+                  {applications.map((application) => (
+                    <ApplicationDetails key={application._id} application={application} />
                   ))}
                 </div>
-
-                {selectedConversation ? (
-                  <ApplicationChat
-                    key={selectedConversation._id}
-                    conversationId={selectedConversation._id}
-                    visitorName={selectedConversation.visitorName}
-                    mode="admin"
+              ) : (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  No applications have been submitted yet.
+                </p>
+              )}
+            </section>
+          ) : (
+            <section className="pt-8" aria-labelledby="messages-heading" role="tabpanel">
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <span className="eyebrow">Live support</span>
+                  <h2 id="messages-heading" className="mt-2 text-2xl">
+                    Applicant messages
+                  </h2>
+                </div>
+                <label className="relative block w-full sm:max-w-xs">
+                  <span className="sr-only">Search conversations</span>
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    className="field pl-9"
+                    type="search"
+                    value={conversationSearch}
+                    onChange={(event) => setConversationSearch(event.target.value)}
+                    placeholder="Search name, email, message"
                   />
-                ) : (
-                  <p className="py-8 text-sm text-muted-foreground">Choose a conversation.</p>
-                )}
+                </label>
               </div>
-            ) : (
-              <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                No conversations yet. A chat starts when an applicant sends a message after
-                applying.
-              </p>
-            )}
-          </section>
-        </div>
+
+              {isLoading ? (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  Loading conversations...
+                </p>
+              ) : conversations.length ? (
+                <div className="grid min-h-[32rem] gap-6 xl:grid-cols-[minmax(15rem,0.65fr)_minmax(0,1.35fr)]">
+                  <div className="max-h-[42rem] divide-y divide-border overflow-y-auto border-y border-border">
+                    {filteredConversations.map((conversation) => (
+                      <button
+                        key={conversation._id}
+                        type="button"
+                        onClick={() => setSelectedConversationId(conversation._id)}
+                        aria-pressed={conversation._id === selectedConversationId}
+                        className={`block w-full px-3 py-4 text-left transition-colors hover:bg-muted ${conversation._id === selectedConversationId ? "bg-muted" : ""
+                          }`}
+                      >
+                        <span className="flex items-center gap-2 text-sm font-semibold">
+                          <MessageCircle className="size-4 shrink-0 text-primary" />
+                          <span className="truncate">{conversation.visitorName}</span>
+                        </span>
+                        <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
+                          {conversation.lastMessage?.body ?? conversation.visitorEmail}
+                        </span>
+                        <span className="mt-2 flex items-center justify-between gap-2 pl-6 text-[11px] text-muted-foreground">
+                          <span>
+                            {conversation.type === "support" ? "Website chat" : "Application"}
+                          </span>
+                          <time>
+                            {new Intl.DateTimeFormat(undefined, {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            }).format(new Date(conversation.lastMessageAt))}
+                          </time>
+                        </span>
+                      </button>
+                    ))}
+                    {!filteredConversations.length && (
+                      <p className="px-4 py-8 text-sm text-muted-foreground">
+                        No conversations match that search.
+                      </p>
+                    )}
+                  </div>
+
+                  {selectedConversation ? (
+                    <ApplicationChat
+                      key={selectedConversation._id}
+                      conversationId={selectedConversation._id}
+                      visitorName={selectedConversation.visitorName}
+                      mode="admin"
+                    />
+                  ) : (
+                    <p className="grid min-h-64 place-items-center border-y border-border text-sm text-muted-foreground">
+                      Choose a conversation to view messages.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  No conversations yet. Website chats and application conversations will appear
+                  here.
+                </p>
+              )}
+            </section>
+          )}
+        </>
       )}
     </section>
   );
