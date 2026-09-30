@@ -7,27 +7,16 @@ import { applicationsRouter } from "./routes/applications.js";
 import { authRouter } from "./routes/auth.js";
 import { chatRouter } from "./routes/chat.js";
 
-export function isAllowedOrigin(origin?: string): boolean {
-    const configuredOrigins = process.env.CLIENT_ORIGIN
-        ?.split(",")
-        .map((value) => value.trim());
-
-    return (
-        !origin ||
-        (configuredOrigins
-            ? configuredOrigins.includes(origin)
-            : /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin))
-    );
-}
-
 export function createApp() {
     const app = express();
     app.set("trust proxy", 1);
 
     app.use(
         cors({
+            origin: true,
             credentials: true,
-            origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
+            methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
         }),
     );
     app.use(cookieParser());
