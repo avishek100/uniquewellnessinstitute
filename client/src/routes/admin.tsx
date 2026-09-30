@@ -1,11 +1,10 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
+import { apiUrl } from "@/lib/api-url";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
-
-const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 type Application = {
   _id: string;

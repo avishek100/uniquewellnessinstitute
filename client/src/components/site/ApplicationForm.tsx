@@ -1,9 +1,8 @@
+import { apiUrl } from "@/lib/api-url";
 import { saveVisitorChatSession } from "@/lib/visitor-chat";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { ApplicationChat } from "./ApplicationChat";
-
-const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 const relations = [
   "Mother",
@@ -89,11 +88,10 @@ export function ApplicationForm() {
                   key={type}
                   type="button"
                   onClick={() => setStudentType(type)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                    studentType === type
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize transition-colors ${studentType === type
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   {type}
                 </button>

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiUrl } from "./api-url";
 
 export type AuthSessionUser = {
     fullName: string;
@@ -9,7 +10,6 @@ export type AuthSessionUser = {
 export const authSessionQueryKey = ["auth", "session"] as const;
 
 async function fetchAuthSession(): Promise<AuthSessionUser | null> {
-    const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
     const response = await fetch(`${apiUrl}/api/auth/me`, { credentials: "include" });
     if (response.status === 401) return null;
     if (!response.ok) throw new Error("Could not check sign-in status.");

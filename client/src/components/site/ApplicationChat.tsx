@@ -1,9 +1,8 @@
+import { apiUrl } from "@/lib/api-url";
 import { Link } from "@tanstack/react-router";
 import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io, type Socket } from "socket.io-client";
-
-const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 type ChatMessage = {
   _id: string;

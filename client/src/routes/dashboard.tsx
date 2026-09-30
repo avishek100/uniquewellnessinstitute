@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api-url";
 import { authSessionQueryKey } from "@/lib/auth-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -11,8 +12,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-
-const apiUrl = (import.meta.env["VITE_API_URL"] ?? "http://localhost:4000").replace(/\/$/, "");
 
 type Student = {
     fullName: string;

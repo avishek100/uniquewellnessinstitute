@@ -15,11 +15,11 @@
 
 1. Import this repository into Vercel and set the project root directory to `client`.
 2. Use `npm run build` as the build command. The Vite config selects Nitro's Vercel preset for the server-rendered TanStack Start app.
-3. Set `VITE_API_URL` to the Render service URL, with no trailing slash, for example `https://unique-wellness-api.onrender.com`.
+3. Set `VITE_API_URL` to the Render service URL, with no trailing slash, for example `https://unique-wellness-api.onrender.com`. Set it for each Vercel environment you use (Production and Preview), then redeploy; Vite embeds this value during the build.
 4. Deploy, then update Render's `CLIENT_ORIGIN` to the final Vercel/custom-domain origin and redeploy the API if needed.
 
 ## Domains and cookies
 
-For login and admin sessions, use custom domains on the same parent domain when possible, such as `app.uniquewellnessinstitute.com` on Vercel and `api.uniquewellnessinstitute.com` on Render. Set `CLIENT_ORIGIN` to the app domain and `VITE_API_URL` to the API domain. This keeps the credentialed API requests same-site while allowing the API's HTTP-only session cookie to work with `SameSite=Lax`.
+For login and admin sessions, use custom domains on the same parent domain when possible, such as `app.uniquewellnessinstitute.com` on Vercel and `api.uniquewellnessinstitute.com` on Render. Set `CLIENT_ORIGIN` to the exact app origin and `VITE_API_URL` to the API domain. If multiple frontend origins must be allowed, list them comma-separated in `CLIENT_ORIGIN`. The API sets its HTTP-only session cookie with `SameSite=None; Secure` in production; browser third-party-cookie restrictions can still affect the default cross-site Vercel and Render domains.
 
 The default `*.vercel.app` and `*.onrender.com` hostnames are cross-site. Browser third-party-cookie restrictions can prevent session-based login from working across those default domains, even when CORS is configured correctly.

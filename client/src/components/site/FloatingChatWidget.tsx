@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api-url";
 import { authSessionQueryKey, useAuthSession } from "@/lib/auth-session";
 import {
     getVisitorChatSession,
@@ -12,8 +13,6 @@ import { MessageCircle, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { ApplicationChat } from "./ApplicationChat";
-
-const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 export function FloatingChatWidget() {
     const location = useLocation();

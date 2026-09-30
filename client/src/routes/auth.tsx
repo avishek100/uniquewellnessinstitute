@@ -1,10 +1,9 @@
+import { apiUrl } from "@/lib/api-url";
 import { authSessionQueryKey, type AuthSessionUser } from "@/lib/auth-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-
-const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 type AuthResponse = {
   message?: string;
