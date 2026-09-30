@@ -125,14 +125,14 @@ authRouter.get("/me", async (request, response) => {
 
     const userId = getSessionUserId(request.cookies?.[sessionCookieName]);
     if (!userId) {
-        response.status(401).json({ message: "Not signed in." });
+        response.json({ user: null });
         return;
     }
 
     const user = await User.findById(userId);
     if (!user) {
         clearSessionCookie(response);
-        response.status(401).json({ message: "Not signed in." });
+        response.json({ user: null });
         return;
     }
     response.json({ user: toPublicUser(user) });

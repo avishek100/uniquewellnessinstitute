@@ -73,10 +73,14 @@ function StudentDashboard() {
                     user?: Student;
                 };
                 if (!response.ok) throw new Error(result.message ?? "Could not load your account.");
-                return result.user ?? null;
+                if (!result.user) {
+                    await navigate({ to: "/auth", replace: true });
+                    return null;
+                }
+                return result.user;
             })
             .then((result) => {
-                if (active) setStudent(result);
+                if (active && result) setStudent(result);
             })
             .catch((error: unknown) => {
                 if (active) setLoadError(error instanceof Error ? error.message : "Could not load your account.");
