@@ -1,4 +1,7 @@
-const knownClientOrigins = ["https://uniquewellnessinstitute-three.vercel.app"];
+const knownClientOrigins = [
+    "https://uniquewellnessinstitute-three.vercel.app",
+    "http://localhost:8080",
+];
 
 export function isAllowedClientOrigin(origin: string | undefined): boolean {
     if (!origin) return true;
