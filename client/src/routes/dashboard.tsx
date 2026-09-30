@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/api-url";
+import { apiClient } from "@/lib/api";
 import { authSessionQueryKey } from "@/lib/auth-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -62,7 +62,7 @@ function StudentDashboard() {
 
     useEffect(() => {
         let active = true;
-        void fetch(`${apiUrl}/api/auth/me`, { credentials: "include" })
+        void apiClient.request("/api/auth/me", { credentials: "include" })
             .then(async (response) => {
                 if (response.status === 401) {
                     await navigate({ to: "/auth", replace: true });
@@ -96,7 +96,7 @@ function StudentDashboard() {
         let active = true;
         setIsLoadingClasses(true);
         setClassesError("");
-        void fetch(`${apiUrl}/api/classes`, { credentials: "include" })
+        void apiClient.request("/api/classes", { credentials: "include" })
             .then(async (response) => {
                 if (response.status === 401) {
                     await navigate({ to: "/auth", replace: true });
@@ -126,7 +126,7 @@ function StudentDashboard() {
 
     async function handleSignOut() {
         try {
-            const response = await fetch(`${apiUrl}/api/auth/logout`, {
+            const response = await apiClient.request("/api/auth/logout", {
                 method: "POST",
                 credentials: "include",
             });
@@ -143,7 +143,7 @@ function StudentDashboard() {
         const formData = new FormData(event.currentTarget);
         setIsSavingProfile(true);
         try {
-            const response = await fetch(`${apiUrl}/api/auth/me`, {
+            const response = await apiClient.request("/api/auth/me", {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -170,7 +170,7 @@ function StudentDashboard() {
         const formData = new FormData(form);
         setIsChangingPassword(true);
         try {
-            const response = await fetch(`${apiUrl}/api/auth/password`, {
+            const response = await apiClient.request("/api/auth/password", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

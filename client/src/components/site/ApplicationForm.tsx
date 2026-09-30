@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/api-url";
+import { apiClient } from "@/lib/api";
 import { saveVisitorChatSession } from "@/lib/visitor-chat";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ export function ApplicationForm() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${apiUrl}/api/applications`, {
+      const response = await apiClient.request("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload, studentType }),
@@ -89,8 +89,8 @@ export function ApplicationForm() {
                   type="button"
                   onClick={() => setStudentType(type)}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize transition-colors ${studentType === type
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground"
                     }`}
                 >
                   {type}

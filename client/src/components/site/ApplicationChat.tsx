@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/api-url";
+import { API_BASE_URL, apiClient } from "@/lib/api";
 import { Link } from "@tanstack/react-router";
 import { Send, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -45,9 +45,9 @@ export function ApplicationChat({
       try {
         const endpoint =
           mode === "admin"
-            ? `${apiUrl}/api/admin/conversations/${conversationId}/messages`
-            : `${apiUrl}/api/chat/${conversationId}/messages`;
-        const response = await fetch(endpoint, { credentials: "include", headers });
+            ? `/api/admin/conversations/${conversationId}/messages`
+            : `/api/chat/${conversationId}/messages`;
+        const response = await apiClient.request(endpoint, { credentials: "include", headers });
         const result = (await response.json().catch(() => ({}))) as {
           messages?: ChatMessage[];
           message?: string;
@@ -76,7 +76,7 @@ export function ApplicationChat({
       }
     }
 
-    const socket = io(apiUrl, {
+    const socket = io(API_BASE_URL, {
       withCredentials: true,
       auth: { conversationId, ...(chatToken ? { chatToken } : {}) },
     });

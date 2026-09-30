@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/api-url";
+import { API_BASE_URL, apiClient } from "@/lib/api";
 import { authSessionQueryKey, useAuthSession } from "@/lib/auth-session";
 import {
     getVisitorChatSession,
@@ -45,9 +45,9 @@ export function FloatingChatWidget() {
         let active = true;
         const readAt = session.lastReadAt ? Date.parse(session.lastReadAt) : 0;
         const headers = { "x-chat-token": session.chatToken };
-        const endpoint = `${apiUrl}/api/chat/${session.conversationId}/messages`;
+        const endpoint = `/api/chat/${session.conversationId}/messages`;
 
-        void fetch(endpoint, { credentials: "include", headers })
+        void apiClient.request(endpoint, { credentials: "include", headers })
             .then(async (response) => (await response.json().catch(() => ({}))) as {
                 messages?: Array<{ sender: string; createdAt: string }>;
             })
@@ -61,7 +61,7 @@ export function FloatingChatWidget() {
                 }
             });
 
-        const socket = io(apiUrl, {
+        const socket = io(API_BASE_URL, {
             withCredentials: true,
             auth: { conversationId: session.conversationId, chatToken: session.chatToken },
         });
@@ -100,7 +100,7 @@ export function FloatingChatWidget() {
         setError("");
 
         try {
-            const response = await fetch(`${apiUrl}/api/chat/conversations`, {
+            const response = await apiClient.request("/api/chat/conversations", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

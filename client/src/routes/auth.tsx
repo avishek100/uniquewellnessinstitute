@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/api-url";
+import { apiClient } from "@/lib/api";
 import { authSessionQueryKey, type AuthSessionUser } from "@/lib/auth-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -33,7 +33,7 @@ function AuthPage() {
   const queryClient = useQueryClient();
 
   async function requestAuth(path: string, body: Record<string, string>) {
-    const response = await fetch(`${apiUrl}/api/auth/${path}`, {
+    const response = await apiClient.request(`/api/auth/${path}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

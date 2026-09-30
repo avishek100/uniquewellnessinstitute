@@ -1,5 +1,5 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
-import { apiUrl } from "@/lib/api-url";
+import { API_BASE_URL, apiClient } from "@/lib/api";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -53,7 +53,7 @@ class AdminRequestError extends Error {
 }
 
 async function getAdminData<T>(path: string): Promise<T> {
-  const response = await fetch(`${apiUrl}/api/admin/${path}`, { credentials: "include" });
+  const response = await apiClient.request(`/api/admin/${path}`, { credentials: "include" });
   const result = (await response.json().catch(() => ({}))) as T & { message?: string };
   if (!response.ok) {
     throw new AdminRequestError(result.message ?? "Could not load admin data.", response.status);
@@ -116,7 +116,7 @@ function AdminPage() {
           ),
         );
 
-        socket = io(apiUrl, { withCredentials: true });
+        socket = io(API_BASE_URL, { withCredentials: true });
         socket.on("chat:conversation-updated", (updated: Conversation) => {
           if (!active) return;
           setConversations((current) => {
@@ -179,7 +179,7 @@ function AdminPage() {
     const formData = new FormData(form);
     setIsSavingClass(true);
     try {
-      const response = await fetch(`${apiUrl}/api/admin/classes`, {
+      const response = await apiClient.request("/api/admin/classes", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
