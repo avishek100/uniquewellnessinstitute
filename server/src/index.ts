@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { createServer } from "node:http";
-import { randomBytes } from "node:crypto";
 import { createApp } from "./app.js";
 import { attachChatSocket } from "./chat/socket.js";
 import { connectToDatabase } from "./config/database.js";
@@ -13,12 +12,7 @@ if (configuredSecret && configuredSecret.length < 32) {
 }
 
 if (!configuredSecret) {
-    if (process.env.NODE_ENV === "production") {
-        throw new Error("JWT_SECRET must be set in production.");
-    }
-
-    process.env.JWT_SECRET = randomBytes(48).toString("hex");
-    console.warn("JWT_SECRET is unset; using a temporary development secret. Sessions reset when the API restarts.");
+    throw new Error("JWT_SECRET must be set in the server environment.");
 }
 
 await connectToDatabase();

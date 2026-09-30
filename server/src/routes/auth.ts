@@ -4,7 +4,12 @@ import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 import { timingSafeEqual } from "node:crypto";
 import { User } from "../models/User.js";
-import { loginInputSchema, signupInputSchema } from "../schemas/auth.js";
+import {
+    changePasswordInputSchema,
+    loginInputSchema,
+    profileInputSchema,
+    signupInputSchema,
+} from "../schemas/auth.js";
 import {
     clearSessionCookie,
     getSessionUserId,
@@ -23,9 +28,7 @@ const authRateLimit = rateLimit({
     legacyHeaders: false,
 });
 
-authRouter.use(authRateLimit);
-
-authRouter.post("/signup", async (request, response) => {
+authRouter.post("/signup", authRateLimit, async (request, response) => {
     const parsed = signupInputSchema.safeParse(request.body);
     if (!parsed.success) {
         response.status(400).json({ message: "Please check your account details." });
@@ -65,7 +68,7 @@ authRouter.post("/signup", async (request, response) => {
     }
 });
 
-authRouter.post("/login", async (request, response) => {
+authRouter.post("/login", authRateLimit, async (request, response) => {
     const parsed = loginInputSchema.safeParse(request.body);
     if (!parsed.success) {
         response.status(400).json({ message: "Please enter a valid email and password." });
@@ -133,6 +136,92 @@ authRouter.get("/me", async (request, response) => {
         return;
     }
     response.json({ user: toPublicUser(user) });
+});
+
+authRouter.patch("/me", async (request, response) => {
+    const parsed = profileInputSchema.safeParse(request.body);
+    if (!parsed.success) {
+        response.status(400).json({ message: "Please check your account details." });
+        return;
+    }
+    if (!isSessionConfigured()) {
+        response.status(503).json({ message: "Account services are not configured." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Account services are temporarily unavailable." });
+        return;
+    }
+
+    const userId = getSessionUserId(request.cookies?.[sessionCookieName]);
+    if (!userId) {
+        response.status(401).json({ message: "Not signed in." });
+        return;
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            clearSessionCookie(response);
+            response.status(401).json({ message: "Not signed in." });
+            return;
+        }
+
+        user.fullName = parsed.data.fullName;
+        user.phone = parsed.data.phone;
+        user.email = parsed.data.email;
+        await user.save();
+        response.json({ user: toPublicUser(user) });
+    } catch (error) {
+        if (isDuplicateKeyError(error)) {
+            response.status(409).json({ message: "An account with this email already exists." });
+            return;
+        }
+        console.error("Could not update account:", error);
+        response.status(500).json({ message: "Could not update the account." });
+    }
+});
+
+authRouter.post("/password", authRateLimit, async (request, response) => {
+    const parsed = changePasswordInputSchema.safeParse(request.body);
+    if (!parsed.success) {
+        response.status(400).json({ message: "Please enter a valid current and new password." });
+        return;
+    }
+    if (!isSessionConfigured()) {
+        response.status(503).json({ message: "Account services are not configured." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Account services are temporarily unavailable." });
+        return;
+    }
+
+    const userId = getSessionUserId(request.cookies?.[sessionCookieName]);
+    if (!userId) {
+        response.status(401).json({ message: "Not signed in." });
+        return;
+    }
+
+    try {
+        const user = await User.findById(userId).select("+passwordHash");
+        if (!user?.passwordHash) {
+            clearSessionCookie(response);
+            response.status(401).json({ message: "Not signed in." });
+            return;
+        }
+        if (!(await bcrypt.compare(parsed.data.currentPassword, user.passwordHash))) {
+            response.status(400).json({ message: "Current password is incorrect." });
+            return;
+        }
+
+        user.passwordHash = await bcrypt.hash(parsed.data.newPassword, 12);
+        await user.save();
+        response.json({ message: "Password updated." });
+    } catch (error) {
+        console.error("Could not update password:", error);
+        response.status(500).json({ message: "Could not update the password." });
+    }
 });
 
 authRouter.post("/logout", (_request, response) => {

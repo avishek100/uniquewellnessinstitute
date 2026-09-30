@@ -1,0 +1,1 @@
+var e=`/assets/online-lesson-DeaYsM8q.png`;export{e as t};

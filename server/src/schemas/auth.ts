@@ -15,3 +15,14 @@ export const loginInputSchema = z.object({
     password: z.string().min(1).max(128),
 });
 
+export const profileInputSchema = z.object({
+    fullName: z.string().trim().min(2).max(100),
+    phone: z.string().trim().min(7).max(32),
+    email: emailSchema,
+});
+
+export const changePasswordInputSchema = z.object({
+    currentPassword: z.string().min(1).max(128),
+    newPassword: passwordSchema,
+});
+

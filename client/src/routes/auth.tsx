@@ -1,13 +1,15 @@
+import { authSessionQueryKey, type AuthSessionUser } from "@/lib/auth-session";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
-const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 type AuthResponse = {
   message?: string;
   isAdmin?: boolean;
-  user?: { fullName: string; email: string };
+  user?: AuthSessionUser;
 };
 
 export const Route = createFileRoute("/auth")({
@@ -29,6 +31,7 @@ function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   async function requestAuth(path: string, body: Record<string, string>) {
     const response = await fetch(`${apiUrl}/api/auth/${path}`, {
@@ -50,6 +53,9 @@ function AuthPage() {
     try {
       const result = await requestAuth(mode === "signup" ? "signup" : "login", payload);
       const signedInAsAdmin = result.isAdmin === true;
+      if (!signedInAsAdmin && result.user) {
+        queryClient.setQueryData(authSessionQueryKey, result.user);
+      }
       toast.success(
         signedInAsAdmin
           ? "Admin signed in"
@@ -60,7 +66,7 @@ function AuthPage() {
           description: result.user?.fullName,
         },
       );
-      await navigate({ to: signedInAsAdmin ? "/admin" : "/" });
+      await navigate({ to: signedInAsAdmin ? "/admin" : "/dashboard" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Account request failed.");
     } finally {

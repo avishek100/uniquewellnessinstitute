@@ -1,22 +1,32 @@
+import { authSessionQueryKey, useAuthSession } from "@/lib/auth-session";
 import {
     getVisitorChatSession,
+    markVisitorChatRead,
     saveVisitorChatSession,
     visitorChatSessionEvent,
     type VisitorChatSession,
 } from "@/lib/visitor-chat";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
 import { MessageCircle, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import { ApplicationChat } from "./ApplicationChat";
 
 const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
 export function FloatingChatWidget() {
     const location = useLocation();
+    const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
     const [session, setSession] = useState<VisitorChatSession | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const [isCheckingAuthentication, setIsCheckingAuthentication] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const { data: authUser, isPending: isCheckingAuthentication } = useAuthSession(
+        location.pathname !== "/admin" &&
+        location.pathname !== "/auth" &&
+        location.pathname !== "/dashboard",
+    );
+    const isAuthenticated = Boolean(authUser);
     const [isStarting, setIsStarting] = useState(false);
     const [error, setError] = useState("");
 
@@ -28,25 +38,62 @@ export function FloatingChatWidget() {
     }, []);
 
     useEffect(() => {
+        if (!session) {
+            setUnreadCount(0);
+            return;
+        }
+
         let active = true;
-        setIsCheckingAuthentication(true);
-        void fetch(`${apiUrl}/api/auth/me`, { credentials: "include" })
-            .then((response) => {
-                if (active) setIsAuthenticated(response.ok);
+        const readAt = session.lastReadAt ? Date.parse(session.lastReadAt) : 0;
+        const headers = { "x-chat-token": session.chatToken };
+        const endpoint = `${apiUrl}/api/chat/${session.conversationId}/messages`;
+
+        void fetch(endpoint, { credentials: "include", headers })
+            .then(async (response) => (await response.json().catch(() => ({}))) as {
+                messages?: Array<{ sender: string; createdAt: string }>;
             })
-            .catch(() => {
-                if (active) setIsAuthenticated(false);
-            })
-            .finally(() => {
-                if (active) setIsCheckingAuthentication(false);
+            .then((result) => {
+                if (active && !isOpen) {
+                    setUnreadCount(
+                        (result.messages ?? []).filter(
+                            (message) => message.sender === "admin" && Date.parse(message.createdAt) > readAt,
+                        ).length,
+                    );
+                }
             });
+
+        const socket = io(apiUrl, {
+            withCredentials: true,
+            auth: { conversationId: session.conversationId, chatToken: session.chatToken },
+        });
+        socket.on("chat:message", (message: { sender?: string }) => {
+            if (active && !isOpen && message.sender === "admin") {
+                setUnreadCount((count) => count + 1);
+            }
+        });
 
         return () => {
             active = false;
+            socket.disconnect();
         };
-    }, [location.pathname]);
+    }, [isOpen, session]);
 
-    if (location.pathname === "/admin" || location.pathname === "/auth") return null;
+    function handleChatToggle() {
+        setIsOpen((open) => {
+            const nextOpen = !open;
+            if (nextOpen) {
+                markVisitorChatRead();
+                setUnreadCount(0);
+            }
+            return nextOpen;
+        });
+    }
+
+    if (
+        location.pathname === "/admin" ||
+        location.pathname === "/auth" ||
+        location.pathname === "/dashboard"
+    ) return null;
     if (isCheckingAuthentication || isAuthenticated !== true) return null;
 
     async function handleStartChat() {
@@ -65,17 +112,18 @@ export function FloatingChatWidget() {
                 conversationId?: string;
                 chatToken?: string;
                 visitorName?: string;
-                message?: string;
             };
             if (!response.ok || !result.conversationId || !result.chatToken) {
-                if (response.status === 401) setIsAuthenticated(false);
+                if (response.status === 401) {
+                    queryClient.setQueryData(authSessionQueryKey, null);
+                }
                 throw new Error(result.message ?? "Could not start chat.");
             }
 
             const nextSession = {
                 conversationId: result.conversationId,
                 chatToken: result.chatToken,
-                visitorName: result.visitorName ?? String(formData.get("visitorName")),
+                visitorName: result.visitorName ?? "Visitor",
             };
             saveVisitorChatSession(nextSession);
             setSession(nextSession);
@@ -160,13 +208,21 @@ export function FloatingChatWidget() {
             )}
             <button
                 type="button"
-                onClick={() => setIsOpen((open) => !open)}
-                className="grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                onClick={handleChatToggle}
+                className="relative grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
                 aria-label={isOpen ? "Close support chat" : "Open support chat"}
                 aria-expanded={isOpen}
                 title={isOpen ? "Close support chat" : "Chat with our team"}
             >
                 {isOpen ? <X className="size-6" /> : <MessageCircle className="size-6" />}
+                {!isOpen && unreadCount > 0 && (
+                    <span
+                        className="absolute -right-1 -top-1 grid min-w-6 place-items-center rounded-full bg-destructive px-1.5 py-1 text-xs font-bold text-destructive-foreground"
+                        aria-label={`${unreadCount} unread chat message${unreadCount === 1 ? "" : "s"}`}
+                    >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                )}
             </button>
         </div>
     );

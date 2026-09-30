@@ -2,6 +2,7 @@ export type VisitorChatSession = {
   conversationId: string;
   chatToken: string;
   visitorName: string;
+  lastReadAt?: string;
 };
 
 const storageKey = "uwi_visitor_chat";
@@ -30,6 +31,11 @@ export function getVisitorChatSession(): VisitorChatSession | null {
 export function saveVisitorChatSession(session: VisitorChatSession): void {
   window.sessionStorage.setItem(storageKey, JSON.stringify(session));
   window.dispatchEvent(new Event(sessionEvent));
+}
+
+export function markVisitorChatRead(): void {
+  const session = getVisitorChatSession();
+  if (session) saveVisitorChatSession({ ...session, lastReadAt: new Date().toISOString() });
 }
 
 export function visitorChatSessionEvent(): string {

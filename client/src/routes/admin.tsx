@@ -1,8 +1,9 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io } from "socket.io-client";
+import { toast } from "sonner";
 
 const apiUrl = import.meta.env["VITE_API_URL"] ?? "http://localhost:4000";
 
@@ -34,6 +35,15 @@ type Conversation = {
   };
 };
 
+type ScheduledClass = {
+  _id: string;
+  title: string;
+  startsAt: string;
+  instructor: string;
+  description: string;
+  meetingUrl: string;
+};
+
 class AdminRequestError extends Error {
   constructor(
     message: string,
@@ -63,14 +73,18 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const [activeSection, setActiveSection] = useState<"applications" | "messages">("applications");
+  const [activeSection, setActiveSection] = useState<"applications" | "messages" | "classes">("applications");
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set());
+  const [scheduledClasses, setScheduledClasses] = useState<ScheduledClass[]>([]);
+  const [isSavingClass, setIsSavingClass] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState("");
   const [conversationSearch, setConversationSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  const selectedConversationIdRef = useRef("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,16 +95,26 @@ function AdminPage() {
       setIsLoading(true);
       setError("");
       try {
-        const [applicationResult, conversationResult] = await Promise.all([
+        const [applicationResult, conversationResult, classResult] = await Promise.all([
           getAdminData<{ applications: Application[] }>("applications"),
           getAdminData<{ conversations: Conversation[] }>("conversations"),
+          getAdminData<{ classes: ScheduledClass[] }>("classes"),
         ]);
         if (!active) return;
 
         setApplications(applicationResult.applications);
         setConversations(conversationResult.conversations);
-        setSelectedConversationId(
-          (current) => current || conversationResult.conversations[0]?._id || "",
+        setScheduledClasses(classResult.classes);
+        const initialConversationId = selectedConversationIdRef.current || conversationResult.conversations[0]?._id || "";
+        selectedConversationIdRef.current = initialConversationId;
+        setSelectedConversationId(initialConversationId);
+        setUnreadConversationIds(
+          new Set(
+            conversationResult.conversations
+              .filter((conversation) => conversation.lastMessage?.sender === "visitor")
+              .map((conversation) => conversation._id)
+              .filter((conversationId) => conversationId !== initialConversationId),
+          ),
         );
 
         socket = io(apiUrl, { withCredentials: true });
@@ -100,6 +124,9 @@ function AdminPage() {
             const remaining = current.filter((item) => item._id !== updated._id);
             return [updated, ...remaining];
           });
+          if (updated.lastMessage?.sender === "visitor" && updated._id !== selectedConversationIdRef.current) {
+            setUnreadConversationIds((current) => new Set(current).add(updated._id));
+          }
         });
       } catch (loadError) {
         if (active) {
@@ -124,6 +151,16 @@ function AdminPage() {
     };
   }, [navigate, reloadKey]);
 
+  function selectConversation(conversationId: string) {
+    selectedConversationIdRef.current = conversationId;
+    setSelectedConversationId(conversationId);
+    setUnreadConversationIds((current) => {
+      const next = new Set(current);
+      next.delete(conversationId);
+      return next;
+    });
+  }
+
   const selectedConversation = conversations.find(
     (conversation) => conversation._id === selectedConversationId,
   );
@@ -136,6 +173,39 @@ function AdminPage() {
       conversation.lastMessage?.body.toLowerCase().includes(query)
     );
   });
+
+  async function handleScheduleClass(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    setIsSavingClass(true);
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/classes`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData.entries())),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        scheduledClass?: ScheduledClass;
+      };
+      if (!response.ok || !result.scheduledClass) {
+        throw new Error(result.message ?? "Could not schedule the class.");
+      }
+      setScheduledClasses((current) =>
+        [...current, result.scheduledClass!].sort(
+          (first, second) => Date.parse(first.startsAt) - Date.parse(second.startsAt),
+        ),
+      );
+      form.reset();
+      toast.success("Upcoming class added.");
+    } catch (scheduleError) {
+      toast.error(scheduleError instanceof Error ? scheduleError.message : "Could not schedule the class.");
+    } finally {
+      setIsSavingClass(false);
+    }
+  }
 
   return (
     <section className="container-page py-10 sm:py-14">
@@ -180,8 +250,8 @@ function AdminPage() {
               aria-selected={activeSection === "applications"}
               onClick={() => setActiveSection("applications")}
               className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "applications"
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
             >
               Applications <span className="ml-1.5 text-xs">{applications.length}</span>
@@ -192,11 +262,31 @@ function AdminPage() {
               aria-selected={activeSection === "messages"}
               onClick={() => setActiveSection("messages")}
               className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "messages"
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
             >
               Messages <span className="ml-1.5 text-xs">{conversations.length}</span>
+              {unreadConversationIds.size > 0 && (
+                <span
+                  className="ml-2 inline-grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"
+                  aria-label={`${unreadConversationIds.size} unread conversation${unreadConversationIds.size === 1 ? "" : "s"}`}
+                >
+                  {unreadConversationIds.size > 99 ? "99+" : unreadConversationIds.size}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "classes"}
+              onClick={() => setActiveSection("classes")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "classes"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Live Classes <span className="ml-1.5 text-xs">{scheduledClasses.length}</span>
             </button>
           </div>
 
@@ -230,7 +320,7 @@ function AdminPage() {
                 </p>
               )}
             </section>
-          ) : (
+          ) : activeSection === "messages" ? (
             <section className="pt-8" aria-labelledby="messages-heading" role="tabpanel">
               <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -263,7 +353,7 @@ function AdminPage() {
                       <button
                         key={conversation._id}
                         type="button"
-                        onClick={() => setSelectedConversationId(conversation._id)}
+                        onClick={() => selectConversation(conversation._id)}
                         aria-pressed={conversation._id === selectedConversationId}
                         className={`block w-full px-3 py-4 text-left transition-colors hover:bg-muted ${conversation._id === selectedConversationId ? "bg-muted" : ""
                           }`}
@@ -271,6 +361,12 @@ function AdminPage() {
                         <span className="flex items-center gap-2 text-sm font-semibold">
                           <MessageCircle className="size-4 shrink-0 text-primary" />
                           <span className="truncate">{conversation.visitorName}</span>
+                          {unreadConversationIds.has(conversation._id) && (
+                            <span
+                              className="size-2 shrink-0 rounded-full bg-destructive"
+                              aria-label="Unread messages"
+                            />
+                          )}
                         </span>
                         <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
                           {conversation.lastMessage?.body ?? conversation.visitorEmail}
@@ -314,6 +410,73 @@ function AdminPage() {
                   here.
                 </p>
               )}
+            </section>
+          ) : (
+            <section className="pt-8" aria-labelledby="classes-heading" role="tabpanel">
+              <div className="mb-6">
+                <span className="eyebrow">Class schedule</span>
+                <h2 id="classes-heading" className="mt-2 text-2xl">Upcoming classes</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Scheduled classes are visible to all registered students.
+                </p>
+              </div>
+
+              <div className="grid items-start gap-10 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
+                <form className="grid gap-4 border-y border-border py-5" onSubmit={(event) => void handleScheduleClass(event)}>
+                  <h3 className="text-lg font-semibold">Add a class</h3>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Class title
+                    <input className="field" name="title" required minLength={2} maxLength={120} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Date and time
+                    <input className="field" name="startsAt" type="datetime-local" required />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Instructor
+                    <input className="field" name="instructor" maxLength={100} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Meeting link
+                    <input className="field" name="meetingUrl" type="url" placeholder="https://..." maxLength={500} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Details
+                    <textarea className="field min-h-24 resize-y" name="description" maxLength={1000} />
+                  </label>
+                  <button type="submit" className="btn-primary justify-self-start" disabled={isSavingClass || isLoading}>
+                    {isSavingClass ? "Adding class..." : "Add upcoming class"}
+                  </button>
+                </form>
+
+                <div>
+                  <h3 className="text-lg font-semibold">Scheduled classes</h3>
+                  {isLoading ? (
+                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">Loading class schedule...</p>
+                  ) : scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now()).length ? (
+                    <div className="mt-4 divide-y divide-border border-y border-border">
+                      {scheduledClasses
+                        .filter((item) => Date.parse(item.startsAt) > Date.now())
+                        .map((item) => (
+                          <article key={item._id} className="py-5">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <h4 className="font-semibold">{item.title}</h4>
+                              <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <CalendarDays className="size-3.5" />
+                                {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.startsAt))}
+                              </time>
+                            </div>
+                            {item.instructor && <p className="mt-1 text-sm text-muted-foreground">Instructor: {item.instructor}</p>}
+                            {item.description && <p className="mt-2 whitespace-pre-wrap text-sm">{item.description}</p>}
+                            {item.meetingUrl && <a className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4" href={item.meetingUrl} target="_blank" rel="noreferrer">Open meeting link</a>}
+                          </article>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">No upcoming classes have been scheduled.</p>
+                  )}
+                </div>
+              </div>
             </section>
           )}
         </>

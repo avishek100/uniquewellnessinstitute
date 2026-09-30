@@ -4,7 +4,8 @@ import { createHmac } from "node:crypto";
 
 export const sessionCookieName = "uwi_session";
 
-const sessionDurationMs = 7 * 24 * 60 * 60 * 1000;
+const sessionDurationDays = 30;
+const sessionDurationMs = sessionDurationDays * 24 * 60 * 60 * 1000;
 
 export function isSessionConfigured(): boolean {
     return Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32);
@@ -15,7 +16,7 @@ export function setSessionCookie(response: Response, userId: string): boolean {
     if (!secret || secret.length < 32) return false;
 
     const isProduction = process.env.NODE_ENV === "production";
-    const token = jwt.sign({ sub: userId }, secret, { expiresIn: "7d" });
+    const token = jwt.sign({ sub: userId }, secret, { expiresIn: `${sessionDurationDays}d` });
     response.cookie(sessionCookieName, token, {
         httpOnly: true,
         secure: isProduction,
@@ -36,7 +37,7 @@ export function setAdminSessionCookie(response: Response, email: string): boolea
     const token = jwt.sign(
         { sub: email, role: "admin", email, credentialVersion },
         secret,
-        { expiresIn: "7d" },
+        { expiresIn: `${sessionDurationDays}d` },
     );
     response.cookie(sessionCookieName, token, {
         httpOnly: true,

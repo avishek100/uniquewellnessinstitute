@@ -4,11 +4,43 @@ import { requireAdmin } from "../middleware/requireAdmin.js";
 import { Application } from "../models/Application.js";
 import { ChatConversation } from "../models/ChatConversation.js";
 import { ChatMessage } from "../models/ChatMessage.js";
+import { ScheduledClass } from "../models/ScheduledClass.js";
 import { SupportConversation } from "../models/SupportConversation.js";
+import { scheduledClassInputSchema } from "../schemas/scheduledClass.js";
 
 export const adminRouter = Router();
 
 adminRouter.use(requireAdmin);
+
+adminRouter.get("/classes", async (_request, response) => {
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Class schedules are temporarily unavailable." });
+        return;
+    }
+
+    const classes = await ScheduledClass.find().sort({ startsAt: 1 }).limit(200).lean();
+    response.json({ classes });
+});
+
+adminRouter.post("/classes", async (request, response) => {
+    const parsed = scheduledClassInputSchema.safeParse(request.body);
+    if (!parsed.success) {
+        response.status(400).json({ message: "Please check the class details." });
+        return;
+    }
+    const startsAt = new Date(parsed.data.startsAt);
+    if (startsAt.getTime() <= Date.now()) {
+        response.status(400).json({ message: "Choose a future date and time for the class." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Class schedules are temporarily unavailable." });
+        return;
+    }
+
+    const scheduledClass = await ScheduledClass.create({ ...parsed.data, startsAt });
+    response.status(201).json({ scheduledClass });
+});
 
 const conversationPipeline: mongoose.PipelineStage[] = [
     { $sort: { lastMessageAt: -1 } },
