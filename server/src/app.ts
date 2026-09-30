@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
+import { isAllowedClientOrigin } from "./config/clientOrigins.js";
 import { adminRouter } from "./routes/admin.js";
 import { applicationsRouter } from "./routes/applications.js";
 import { authRouter } from "./routes/auth.js";
@@ -11,19 +12,9 @@ import { classesRouter } from "./routes/classes.js";
 export function createApp() {
     const app = express();
     app.set("trust proxy", 1);
-    const allowedOrigins = (process.env.CLIENT_ORIGIN ?? "")
-        .split(",")
-        .map((origin) => origin.trim())
-        .filter(Boolean);
-
     app.use(
         cors({
-            origin: (origin, callback) => {
-                const isLocalDevelopmentOrigin =
-                    process.env.NODE_ENV !== "production" &&
-                    Boolean(origin && /^https?:\/\/(localhost|127(?:\.\d{1,3}){3}|\[::1\])(?::\d+)?$/.test(origin));
-                callback(null, !origin || allowedOrigins.includes(origin) || isLocalDevelopmentOrigin);
-            },
+            origin: (origin, callback) => callback(null, isAllowedClientOrigin(origin)),
             credentials: true,
             methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             allowedHeaders: ["Content-Type", "Authorization", "x-chat-token"],

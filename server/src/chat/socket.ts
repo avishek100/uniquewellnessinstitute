@@ -1,6 +1,7 @@
 import { parseCookie } from "cookie";
 import type { Server as HttpServer } from "node:http";
 import { Server } from "socket.io";
+import { isAllowedClientOrigin } from "../config/clientOrigins.js";
 import { ChatConversation } from "../models/ChatConversation.js";
 import { ChatMessage } from "../models/ChatMessage.js";
 import { SupportConversation } from "../models/SupportConversation.js";
@@ -16,7 +17,7 @@ export function attachChatSocket(httpServer: HttpServer): void {
     const io = new Server(httpServer, {
         cors: {
             credentials: true,
-            origin: true,
+            origin: (origin, callback) => callback(null, isAllowedClientOrigin(origin)),
         },
     });
 

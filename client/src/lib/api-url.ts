@@ -1,10 +1,14 @@
-const configuredApiUrl = import.meta.env["VITE_API_URL"]?.replace(/\/$/, "");
+const configuredApiUrl = import.meta.env["VITE_API_URL"]?.trim().replace(/\/$/, "");
 
-if (
-    import.meta.env.PROD &&
-    (!configuredApiUrl || /^https?:\/\/(localhost|127(?:\.\d{1,3}){3})(?::\d+)?$/.test(configuredApiUrl))
-) {
-    throw new Error("Set VITE_API_URL to the deployed API URL before building for production.");
+if (!configuredApiUrl) {
+    throw new Error("VITE_API_URL must be set to the API URL.");
 }
 
-export const apiUrl = configuredApiUrl ?? "http://localhost:4000";
+if (import.meta.env.PROD) {
+    const hostname = new URL(configuredApiUrl).hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+        throw new Error("VITE_API_URL must not point to localhost in production.");
+    }
+}
+
+export const apiUrl = configuredApiUrl;
