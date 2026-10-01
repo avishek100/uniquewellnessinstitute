@@ -136,6 +136,7 @@ function StudentDashboard() {
             });
             if (!response.ok) throw new Error("Could not sign out. Please try again.");
             queryClient.setQueryData(authSessionQueryKey, null);
+            await queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
             await navigate({ to: "/", replace: true });
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Could not sign out.");
@@ -160,6 +161,7 @@ function StudentDashboard() {
             if (!response.ok || !result.user) throw new Error(result.message ?? "Could not update your profile.");
             setStudent(result.user);
             queryClient.setQueryData(authSessionQueryKey, result.user);
+            await queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
             toast.success("Profile updated.");
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Could not update your profile.");
@@ -333,11 +335,11 @@ function StudentDashboard() {
                                     </label>
                                     <label className="grid gap-1.5 text-sm font-medium">
                                         Email
-                                        <input className="field" name="email" type="email" autoComplete="email" defaultValue={student.email} required />
+                                        <input className="field" name="email" type="email" inputMode="email" autoComplete="email" defaultValue={student.email} required />
                                     </label>
                                     <label className="grid gap-1.5 text-sm font-medium">
                                         Phone number
-                                        <input className="field" name="phone" type="tel" autoComplete="tel" defaultValue={student.phone} required minLength={7} maxLength={32} />
+                                        <input className="field" name="phone" type="tel" inputMode="tel" autoComplete="tel" defaultValue={student.phone} required minLength={7} maxLength={32} />
                                     </label>
                                     <button type="submit" className="btn-primary mt-2 justify-self-start" disabled={isSavingProfile}>
                                         {isSavingProfile ? "Saving..." : "Save changes"}

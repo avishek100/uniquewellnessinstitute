@@ -55,6 +55,7 @@ function AuthPage() {
       if (!signedInAsAdmin && result.user) {
         queryClient.setQueryData(authSessionQueryKey, result.user);
       }
+      await queryClient.invalidateQueries({ queryKey: authSessionQueryKey });
       toast.success(
         signedInAsAdmin
           ? "Admin signed in"
@@ -103,6 +104,7 @@ function AuthPage() {
                   className="field"
                   name="phone"
                   type="tel"
+                  inputMode="tel"
                   placeholder="+91 ..."
                   autoComplete="tel"
                   required
@@ -114,7 +116,14 @@ function AuthPage() {
           )}
           <label className="grid gap-1.5 text-sm font-medium">
             Email
-            <input className="field" name="email" type="email" autoComplete="email" required />
+            <input
+              className="field"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              required
+            />
           </label>
           <label className="grid gap-1.5 text-sm font-medium">
             Password

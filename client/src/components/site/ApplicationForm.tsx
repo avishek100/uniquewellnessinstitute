@@ -103,7 +103,13 @@ export function ApplicationForm() {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="grid gap-1.5 text-sm font-medium">
                 Child&apos;s full name
-                <input className="field" name="childName" placeholder="Full name" required />
+                <input
+                  className="field"
+                  name="childName"
+                  placeholder="Full name"
+                  autoComplete="name"
+                  required
+                />
               </label>
               <label className="grid gap-1.5 text-sm font-medium">
                 Child&apos;s age
@@ -133,7 +139,13 @@ export function ApplicationForm() {
               </label>
               <label className="grid gap-1.5 text-sm font-medium">
                 Your name
-                <input className="field" name="parentName" placeholder="Your name" required />
+                <input
+                  className="field"
+                  name="parentName"
+                  placeholder="Your name"
+                  autoComplete="name"
+                  required
+                />
               </label>
             </div>
           )}
@@ -141,14 +153,28 @@ export function ApplicationForm() {
           {studentType === "adult" && (
             <label className="grid gap-1.5 text-sm font-medium">
               Your name
-              <input className="field" name="name" placeholder="Your name" required />
+              <input
+                className="field"
+                name="name"
+                placeholder="Your name"
+                autoComplete="name"
+                required
+              />
             </label>
           )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-1.5 text-sm font-medium">
               Phone number
-              <input className="field" name="phone" type="tel" placeholder="+91 ..." required />
+              <input
+                className="field"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                placeholder="+91 ..."
+                autoComplete="tel"
+                required
+              />
             </label>
             <label className="grid gap-1.5 text-sm font-medium">
               Email
@@ -156,7 +182,9 @@ export function ApplicationForm() {
                 className="field"
                 name="email"
                 type="email"
+                inputMode="email"
                 placeholder="you@email.com"
+                autoComplete="email"
                 required
               />
             </label>

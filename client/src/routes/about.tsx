@@ -4,13 +4,27 @@ import { BriefcaseBusiness, LockKeyhole, Trophy, Users, Video } from "lucide-rea
 export const Route = createFileRoute("/about")({
     head: () => ({
         meta: [
-            { title: "About Us — Unique Wellness Institute" },
+            { title: "About Us & Career Guidance — Unique Wellness Institute Mumbai" },
             {
                 name: "description",
                 content:
-                    "Meet Unique Wellness Institute and explore chess coaching, career guidance, and student support.",
+                    "Discover Unique Wellness Institute in Mumbai, India. International coach-led chess training and expert career counseling programs for students.",
             },
+            {
+                name: "keywords",
+                content:
+                    "about Unique Wellness Institute, chess academy Mumbai, career guidance Mumbai India, international chess coach, student career counseling India",
+            },
+            { property: "og:title", content: "About Us & Career Guidance — Unique Wellness Institute Mumbai" },
+            {
+                property: "og:description",
+                content:
+                    "Meet Unique Wellness Institute: International chess training under renowned coaches and personalized career counseling in Mumbai, India.",
+            },
+            { property: "og:url", content: "https://uniquewellnessinstitute.com/about" },
+            { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
         ],
+        links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/about" }],
     }),
     component: AboutPage,
 });
@@ -80,7 +94,7 @@ function AboutPage() {
             <section className="container-page py-16 lg:py-20">
                 <div className="max-w-2xl">
                     <span className="eyebrow">What we offer</span>
-                    <h2 className="mt-4 text-3xl sm:text-4xl">Two specialties. One institute.</h2>
+                    <h2 className="mt-4 text-3xl sm:text-4xl">3 Specialities. one Institute.</h2>
                     <p className="mt-4 text-muted-foreground">
                         Chess and career guidance, backed by experience and delivered with care.
                     </p>

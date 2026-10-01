@@ -5,17 +5,27 @@ import { chessCourses } from "@/lib/chess-courses";
 export const Route = createFileRoute("/prices")({
   head: () => ({
     meta: [
-      { title: "Courses & Prices — Unique Wellness Institute" },
+      { title: "Chess Coaching Fees & Course Plans (INR) — Unique Wellness Institute Mumbai" },
       {
         name: "description",
-        content: "Chess courses for every level, with clear course fees and focused coaching.",
+        content:
+          "Affordable and structured online chess courses in India. Beginner to tournament level chess batches with transparent fees starting from ₹5,500. Book a demo class.",
       },
-      { property: "og:title", content: "Courses & Prices — Unique Wellness Institute" },
+      {
+        name: "keywords",
+        content:
+          "chess coaching fees India, chess course price Mumbai, online chess classes cost India, beginner chess course, tournament chess training fees",
+      },
+      { property: "og:title", content: "Chess Coaching Fees & Course Plans (INR) — Unique Wellness Institute" },
       {
         property: "og:description",
-        content: "Explore beginner, intermediate, and advanced chess coaching courses.",
+        content:
+          "Explore beginner, intermediate, and advanced chess coaching courses. Transparent fees starting from ₹5,500.",
       },
+      { property: "og:url", content: "https://uniquewellnessinstitute.com/prices" },
+      { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
     ],
+    links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/prices" }],
   }),
   component: PricesPage,
 });

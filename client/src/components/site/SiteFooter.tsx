@@ -9,6 +9,9 @@ export function SiteFooter() {
             <img
               src="/logo.png"
               alt="Unique Wellness Institute"
+              width={128}
+              height={48}
+              decoding="async"
               className="h-12 w-32 object-contain object-left"
             />
           </Link>

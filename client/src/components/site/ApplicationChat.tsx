@@ -79,9 +79,21 @@ export function ApplicationChat({
     const socket = io(API_BASE_URL, {
       withCredentials: true,
       auth: { conversationId, ...(chatToken ? { chatToken } : {}) },
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 10000,
     });
     socketRef.current = socket;
     socket.on("connect", () => {
+      socket.emit("chat:join", { conversationId }, (result) => {
+        if (!active) return;
+        setStatus(result?.ok ? "Connected" : "Unable to join chat");
+        if (result?.ok) void loadMessages();
+      });
+    });
+    socket.io.on("reconnect", () => {
       socket.emit("chat:join", { conversationId }, (result) => {
         if (!active) return;
         setStatus(result?.ok ? "Connected" : "Unable to join chat");

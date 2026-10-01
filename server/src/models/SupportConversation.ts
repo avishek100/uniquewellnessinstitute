@@ -16,4 +16,6 @@ const supportConversationSchema = new mongoose.Schema(
     { timestamps: true, versionKey: false },
 );
 
+supportConversationSchema.index({ lastMessageAt: -1 });
+
 export const SupportConversation = mongoose.model("SupportConversation", supportConversationSchema);

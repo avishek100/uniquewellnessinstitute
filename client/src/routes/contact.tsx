@@ -6,19 +6,27 @@ import { ApplicationForm } from "@/components/site/ApplicationForm";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact & Free Trial — Unique Wellness Institute" },
+      { title: "Book a Free Demo Chess Class & Contact Us — Mumbai, India" },
       {
         name: "description",
         content:
-          "Book a free trial chess lesson or ask a question. Unique Wellness Institute, Mumbai, India — info@uniquewellnessinstitute.com.",
+          "Book a free live trial chess lesson or schedule a career guidance session. Unique Wellness Institute, Mumbai, India. Call +91 95943 73644 or email info@uniquewellnessinstitute.com.",
       },
-      { property: "og:title", content: "Contact & Free Trial — Unique Wellness Institute" },
+      {
+        name: "keywords",
+        content:
+          "free chess demo class, book chess trial India, contact chess academy Mumbai, chess classes phone number Mumbai, career guidance consultation India",
+      },
+      { property: "og:title", content: "Book a Free Demo Chess Class & Contact Us — Mumbai, India" },
       {
         property: "og:description",
         content:
           "Book a free trial chess lesson or ask a question. Based in Mumbai, teaching students worldwide online.",
       },
+      { property: "og:url", content: "https://uniquewellnessinstitute.com/contact" },
+      { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
     ],
+    links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/contact" }],
   }),
   component: ContactPage,
 });

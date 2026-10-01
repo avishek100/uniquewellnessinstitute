@@ -21,7 +21,7 @@ export const applicationInputSchema = z
         parentName: z.string().trim().optional(),
         name: z.string().trim().optional(),
         phone: z.string().trim().min(7).max(32),
-        email: z.email(),
+        email: z.string().trim().email().transform((e) => e.toLowerCase()),
         message: z.string().trim().max(2000).optional(),
     })
     .superRefine((application, context) => {

@@ -6,13 +6,27 @@ import mrunalKore from "@/assets/murnalkore.png";
 export const Route = createFileRoute("/founders")({
     head: () => ({
         meta: [
-            { title: "Founder — Unique Wellness Institute" },
+            { title: "Founder Mrunal Kore — Unique Wellness Institute Mumbai" },
             {
                 name: "description",
                 content:
-                    "Meet Mrunal Kore, Founder of Unique Wellness Institute, and learn about her experience across hospitality, sales, and training.",
+                    "Meet Mrunal Kore, Founder of Unique Wellness Institute. Leadership in wellness, training, and holistic chess education based in Mumbai, India.",
             },
+            {
+                name: "keywords",
+                content:
+                    "Mrunal Kore, Unique Wellness Institute Founder, chess institute Mumbai founder, leadership wellness training India",
+            },
+            { property: "og:title", content: "Founder Mrunal Kore — Unique Wellness Institute Mumbai" },
+            {
+                property: "og:description",
+                content:
+                    "Meet Mrunal Kore, Founder of Unique Wellness Institute. Decades of leadership across hospitality, sales, training, and wellness education.",
+            },
+            { property: "og:url", content: "https://uniquewellnessinstitute.com/founders" },
+            { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
         ],
+        links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/founders" }],
     }),
     component: FounderPage,
 });

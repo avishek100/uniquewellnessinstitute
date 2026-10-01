@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 import { ChatConversation } from "../models/ChatConversation.js";
 import { Application } from "../models/Application.js";
@@ -7,7 +8,15 @@ import { createChatAccessToken, hashChatAccessToken } from "../utils/chatAccess.
 
 export const applicationsRouter = Router();
 
-applicationsRouter.post("/", async (request, response) => {
+const applicationRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { message: "Too many applications submitted from this network. Please try again in 15 minutes." },
+});
+
+applicationsRouter.post("/", applicationRateLimit, async (request, response) => {
     const parsed = applicationInputSchema.safeParse(request.body);
     if (!parsed.success) {
         response.status(400).json({
