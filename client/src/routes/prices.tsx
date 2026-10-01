@@ -1,6 +1,6 @@
+import { chessCourses } from "@/lib/chess-courses";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
-import { chessCourses } from "@/lib/chess-courses";
 
 export const Route = createFileRoute("/prices")({
   head: () => ({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/prices")({
       {
         name: "description",
         content:
-          "Affordable and structured online chess courses in India. Beginner to tournament level chess batches with transparent fees starting from ₹5,500. Book a demo class.",
+          "Affordable and structured online chess courses in India. Beginner, intermediate, and advanced chess batches with transparent fees from ₹9,000 / $90. Book a demo class.",
       },
       {
         name: "keywords",
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/prices")({
       {
         property: "og:description",
         content:
-          "Explore beginner, intermediate, and advanced chess coaching courses. Transparent fees starting from ₹5,500.",
+          "Explore beginner, intermediate, and advanced chess coaching courses. Transparent fees at ₹9,000 / $90, ₹14,000 / $150, and ₹16,000 / $210.",
       },
       { property: "og:url", content: "https://uniquewellnessinstitute.com/prices" },
       { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
