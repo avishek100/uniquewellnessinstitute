@@ -62,22 +62,27 @@ function FounderPage() {
                     <span className="eyebrow">About Me</span>
                     <div className="mt-5 space-y-5 text-base leading-relaxed text-muted-foreground">
                         <p>
-                            My name is Mrunal Kore. I have gained experience across promotions, food and beverage,
-                            sales, marketing, customer service, and training.
+                            My name is Mrunal Kore. Gained knowledge in multiple fields. Worked in promotions, F&amp;B,
+                            Sales, Marketing, Customer Service, Training etc.
                         </p>
                         <p>
-                            To complete my hospitality education, I joined JPMorgan Chase as a CSA. I became a top
-                            seller and was recognised for delivering excellent customer service.
+                            To complete my hospitality education I joined JP Morgan Chase as a CSA. Fortunately, I
+                            turned out to be the highest seller in sales &amp; providing an excellent customer service.
                         </p>
                         <p>
-                            I was part of the food and beverage service team at the Saudi King&apos;s Palace for
-                            three annual meetings, attended by presidents and kings from around the world. At the
-                            third event, I was part of the team serving Donald Trump, then President of the United
-                            States.
+                            Been a part of F&amp;B service in Saudi&apos;s king palace thrice. Entire countries&apos;
+                            presidents &amp; kings are invited for the annual meeting.
                         </p>
                         <p>
-                            I started with a small training center and gradually expanded. Today, my primary focus
-                            is chess coaching for children and career support.
+                            In the 3rd event was a part of serving honourable Donald Trump. He was the President of
+                            USA that time.
+                        </p>
+                        <p>
+                            Started with small training center and kept expanding gradually.
+                        </p>
+                        <p>
+                            Now there are multiple services provided from my end. Prime focus is on Chess coaching
+                            for kids &amp; Career support.
                         </p>
                     </div>
 
@@ -85,7 +90,7 @@ function FounderPage() {
                         <article className="card-soft p-4">
                             <h2 className="font-semibold">Royal F&amp;B Service</h2>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Served at the Saudi King&apos;s Palace annual meeting three times.
+                                Three times at Saudi king&apos;s palace annual meeting.
                             </p>
                         </article>
                         <article className="card-soft p-4">

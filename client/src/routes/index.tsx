@@ -16,7 +16,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import ajayHonda from "@/assets/ajayhonda.png";
+import dharmandra from "@/assets/dharmandra.png";
 import googleLogo from "@/assets/google.png";
+import omkar from "@/assets/omkar.png";
 import onlineLesson from "@/assets/online-lesson.png";
 import { ApplicationForm } from "@/components/site/ApplicationForm";
 import {
@@ -131,12 +134,11 @@ const testimonials = [
 const googleReviews = [
   {
     id: "chess-coaching-parent",
-    name: "Google reviewer",
+    name: "Ajay Honda",
     meta: "Google review",
     review:
       "The Chess coaching concept followed is really good. My son has grasped the chess very well, Coach is very good at teaching the techniques. He identified his weak points in the chess and provide the necessary help required. I’m highly impressed with Unique Wellness Institute. It's helping my son think on the lines of acquiring control of certain strategic squares rather than merely respond on a move to move basis! They also help the child think of counter moves which enables better learning and to know what the opponent could be thinking. They conduct frequent tournaments and encourage children. I am extremely pleased with they way the classes are conducted and that my son is very eager to attend the classes.",
-    avatarImage:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+    avatarImage: ajayHonda,
   },
   {
     id: "vicky-thakur",
@@ -171,8 +173,7 @@ const googleReviews = [
     meta: "a year ago · 3 reviews",
     review:
       "If you're looking for a one-stop solution for chess coaching, diet plans, career guidance, resume building, English speaking, and job recruitment, then Unique Wellness Institute is an excellent choice. Mrunal Kore, the founder of Unique Wellness Institute, is not only incredibly knowledgeable but also very friendly and approachable. He provides great guidance tailored to individual needs and helps people achieve their goals with clarity and confidence. Highly recommended for anyone seeking professional support in multiple areas!",
-    avatarImage:
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf3771e1?auto=format&fit=crop&w=200&q=80",
+    avatarImage: omkar,
   },
   {
     id: "vishnupriya-duvvru",
@@ -189,8 +190,7 @@ const googleReviews = [
     meta: "a year ago · 1 review · 1 photo",
     review:
       "Very unique and excellent chess coaching institute in Mumbai just like it's name. Mrunal Kore is very good coach for chech. Happy to learn chess from him 😃",
-    avatarImage:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+    avatarImage: dharmandra,
   },
 ];
 
@@ -357,11 +357,21 @@ function Home() {
                       className="mx-auto flex h-fit w-full max-w-[300px] flex-col rounded-[28px] border border-[#e2e2e2] bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-5"
                     >
                       <div className="flex items-center gap-3">
-                        <img
-                          src={avatarImage}
-                          alt={`${name}'s profile`}
-                          className="size-[52px] shrink-0 rounded-full object-cover"
-                        />
+                        {id === "vicky-thakur" ? (
+                          <div
+                            role="img"
+                            aria-label={`${name}'s profile`}
+                            className="flex size-[52px] shrink-0 items-center justify-center rounded-full bg-[#e8eaed] text-lg font-semibold text-[#5f6368]"
+                          >
+                            V
+                          </div>
+                        ) : (
+                          <img
+                            src={avatarImage}
+                            alt={`${name}'s profile`}
+                            className="size-[52px] shrink-0 rounded-full object-cover"
+                          />
+                        )}
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-lg font-medium text-[#1f1f1f]">{name}</div>
                           <div className="mt-1 text-sm text-[#616161]">{meta}</div>

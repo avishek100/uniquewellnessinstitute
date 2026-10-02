@@ -1,6 +1,7 @@
 const knownClientOrigins = [
     "https://uniquewellnessinstitute-three.vercel.app",
     "http://localhost:8080",
+    "http://localhost:8081",
     "http://localhost:3000",
     "http://localhost:5173",
 ];
