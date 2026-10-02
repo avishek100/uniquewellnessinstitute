@@ -9,6 +9,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 import { FloatingChatWidget } from "../components/site/FloatingChatWidget";
 import { SiteFooter } from "../components/site/SiteFooter";
@@ -107,6 +108,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <body>
         {children}
         <Scripts />
+        <Analytics />
       </body>
     </html>
   );
