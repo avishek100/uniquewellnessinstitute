@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BriefcaseBusiness, LockKeyhole, Trophy, Users, Video } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, LockKeyhole, Trophy, Users, Video } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
     head: () => ({
@@ -43,21 +43,33 @@ const benefits = [
         icon: Video,
         title: "HD Live Classes",
         description: "Stable, low-latency video for every session.",
+        badgeBg: "from-indigo-500/20 to-violet-500/10",
+        iconColor: "text-indigo-600 dark:text-indigo-400",
+        borderColor: "hover:border-indigo-500/40",
     },
     {
         icon: LockKeyhole,
         title: "Safe & Secure",
         description: "Role-based access and encrypted data.",
+        badgeBg: "from-emerald-500/20 to-teal-500/10",
+        iconColor: "text-emerald-600 dark:text-emerald-400",
+        borderColor: "hover:border-emerald-500/40",
     },
     {
         icon: Trophy,
         title: "Tournament Prep",
         description: "Custom plans for FIDE-rated events.",
+        badgeBg: "from-amber-500/20 to-yellow-500/10",
+        iconColor: "text-amber-600 dark:text-amber-400",
+        borderColor: "hover:border-amber-500/40",
     },
     {
         icon: Users,
         title: "Active Community",
         description: "Doubt chat, study groups, and peer matches.",
+        badgeBg: "from-blue-500/20 to-cyan-500/10",
+        iconColor: "text-blue-600 dark:text-blue-400",
+        borderColor: "hover:border-blue-500/40",
     },
 ];
 
@@ -85,12 +97,18 @@ function AboutPage() {
                         Chess and career guidance, backed by experience and delivered with care.
                     </p>
                 </div>
-                <div className="mt-9 grid gap-5 lg:grid-cols-2">
+                <div className="mt-9 grid gap-6 lg:grid-cols-2">
                     {services.map(({ id, icon: Icon, eyebrow, title, description, action, href }) => (
-                        <article key={id} id={id} className="card-soft flex scroll-mt-28 flex-col p-6 sm:p-7">
-                            <Icon className="size-6 text-primary" />
-                            <p className="mt-5 text-xs font-semibold uppercase text-primary">{eyebrow}</p>
-                            <h3 className="mt-2 text-2xl">{title}</h3>
+                        <article
+                            key={id}
+                            id={id}
+                            className="group relative rounded-2xl border border-border/80 bg-card/95 p-6 sm:p-8 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl"
+                        >
+                            <div className="relative grid size-14 place-items-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/5 border border-border/60 shadow-xs transition-transform duration-300 group-hover:scale-105">
+                                <Icon className="size-7 text-primary" strokeWidth={2.2} />
+                            </div>
+                            <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</p>
+                            <h3 className="mt-2 text-2xl font-bold tracking-tight">{title}</h3>
                             <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                                 {description}
                             </p>
@@ -99,16 +117,16 @@ function AboutPage() {
                                     href={href}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
                                 >
-                                    {action}
+                                    {action} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                                 </a>
                             ) : (
                                 <Link
                                     to={href}
-                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
                                 >
-                                    {action}
+                                    {action} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                                 </Link>
                             )}
                         </article>
@@ -116,18 +134,27 @@ function AboutPage() {
                 </div>
             </section>
 
-            <section className="bg-secondary/50 py-16 lg:py-20">
+            <section className="bg-secondary/40 py-16 lg:py-20">
                 <div className="container-page">
                     <div className="max-w-2xl">
                         <span className="eyebrow">The experience</span>
-                        <h2 className="mt-4 text-3xl sm:text-4xl">Support at every step.</h2>
+                        <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">Support at every step.</h2>
                     </div>
                     <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {benefits.map(({ icon: Icon, title, description }) => (
-                            <article key={title} className="card-soft p-6">
-                                <Icon className="size-6 text-primary" />
-                                <h3 className="mt-4 text-lg">{title}</h3>
-                                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+                        {benefits.map(({ icon: Icon, title, description, badgeBg, iconColor, borderColor }) => (
+                            <article
+                                key={title}
+                                className={`group relative rounded-2xl border border-border/80 bg-card/95 p-6 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:bg-card hover:shadow-lg ${borderColor}`}
+                            >
+                                <div
+                                    className={`relative grid size-12 place-items-center rounded-2xl bg-linear-to-br ${badgeBg} border border-border/50 shadow-xs transition-transform duration-300 group-hover:scale-110`}
+                                >
+                                    <Icon className={`size-6 ${iconColor}`} strokeWidth={2.2} />
+                                </div>
+                                <h3 className="mt-4 text-base font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                                    {title}
+                                </h3>
+                                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{description}</p>
                             </article>
                         ))}
                     </div>

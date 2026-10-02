@@ -46,34 +46,74 @@ const benefits = [
     icon: Gamepad2,
     title: "Game format",
     text: "Completing chess tasks. Points, ratings, leaders.",
+    badgeBg: "from-emerald-500/20 to-teal-500/10",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    borderColor: "hover:border-emerald-500/40",
+    accentGlow: "bg-emerald-500/10",
   },
   {
     icon: GraduationCap,
     title: "Experienced teachers",
     text: "Many years of teaching experience.",
+    badgeBg: "from-blue-500/20 to-indigo-500/10",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    borderColor: "hover:border-blue-500/40",
+    accentGlow: "bg-blue-500/10",
   },
   {
     icon: MonitorSmartphone,
     title: "All devices",
     text: "Solve tasks on computer, phone or tablet.",
+    badgeBg: "from-cyan-500/20 to-blue-500/10",
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    borderColor: "hover:border-cyan-500/40",
+    accentGlow: "bg-cyan-500/10",
   },
-  { icon: Award, title: "Original courses", text: "Structured chess courses built in-house." },
+  {
+    icon: Award,
+    title: "Original courses",
+    text: "Structured chess courses built in-house.",
+    badgeBg: "from-amber-500/20 to-orange-500/10",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    borderColor: "hover:border-amber-500/40",
+    accentGlow: "bg-amber-500/10",
+  },
   {
     icon: Trophy,
     title: "Competition preparation",
     text: "On request we prepare you for competitions.",
+    badgeBg: "from-yellow-500/20 to-amber-500/10",
+    iconColor: "text-yellow-600 dark:text-yellow-400",
+    borderColor: "hover:border-yellow-500/40",
+    accentGlow: "bg-yellow-500/10",
   },
   {
     icon: Laptop,
     title: "Online learning",
     text: "Lessons with a teacher from anywhere in the world.",
+    badgeBg: "from-indigo-500/20 to-violet-500/10",
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    borderColor: "hover:border-indigo-500/40",
+    accentGlow: "bg-indigo-500/10",
   },
   {
     icon: BrainCircuit,
     title: "Mental skills",
     text: "At any age chess is beneficial for the mind.",
+    badgeBg: "from-purple-500/20 to-pink-500/10",
+    iconColor: "text-purple-600 dark:text-purple-400",
+    borderColor: "hover:border-purple-500/40",
+    accentGlow: "bg-purple-500/10",
   },
-  { icon: Users, title: "Group classes", text: "New friendly connections and joint games." },
+  {
+    icon: Users,
+    title: "Group classes",
+    text: "New friendly connections and joint games.",
+    badgeBg: "from-emerald-500/20 to-green-500/10",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    borderColor: "hover:border-emerald-500/40",
+    accentGlow: "bg-emerald-500/10",
+  },
 ];
 
 const faqs = [
@@ -197,11 +237,13 @@ function Home() {
             Chess and career guidance, backed by experience and delivered with care.
           </p>
         </div>
-        <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <article className="card-soft flex flex-col p-6 sm:p-7">
-            <Trophy className="size-6 text-primary" />
-            <p className="mt-5 text-xs font-semibold uppercase text-primary">Chess Mastery</p>
-            <h3 className="mt-2 text-2xl">International Chess Coaching</h3>
+        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <article className="group relative rounded-2xl border border-border/80 bg-card/95 p-6 sm:p-8 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl">
+            <div className="relative grid size-14 place-items-center rounded-2xl bg-linear-to-br from-amber-500/20 to-yellow-500/10 border border-border/60 shadow-xs transition-transform duration-300 group-hover:scale-105">
+              <Trophy className="size-7 text-amber-600 dark:text-amber-400" strokeWidth={2.2} />
+            </div>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-primary">Chess Mastery</p>
+            <h3 className="mt-2 text-2xl font-bold tracking-tight">International Chess Coaching</h3>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
               For kids aged 5–16. Beginner to advanced batches with tournament preparation under
               International Coach Mr. Vivek Rane.
@@ -209,24 +251,26 @@ function Home() {
             <Link
               to="/"
               hash="courses"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
             >
-              View courses <ArrowRight className="size-4" />
+              View courses <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </article>
-          <article className="card-soft flex flex-col p-6 sm:p-7">
-            <BriefcaseBusiness className="size-6 text-primary" />
-            <p className="mt-5 text-xs font-semibold uppercase text-primary">Career Counseling</p>
-            <h3 className="mt-2 text-2xl">Career &amp; International Employment</h3>
+          <article className="group relative rounded-2xl border border-border/80 bg-card/95 p-6 sm:p-8 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl">
+            <div className="relative grid size-14 place-items-center rounded-2xl bg-linear-to-br from-blue-500/20 to-indigo-500/10 border border-border/60 shadow-xs transition-transform duration-300 group-hover:scale-105">
+              <BriefcaseBusiness className="size-7 text-blue-600 dark:text-blue-400" strokeWidth={2.2} />
+            </div>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-primary">Career Counseling</p>
+            <h3 className="mt-2 text-2xl font-bold tracking-tight">Career &amp; International Employment</h3>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
               Personalised career guidance, interview training, and recruiter-ready resumes, backed
               by experience in hospitality, sales, and recruitment.
             </p>
             <Link
               to="/contact"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
             >
-              Learn more <ArrowRight className="size-4" />
+              Learn more <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </article>
         </div>
@@ -316,22 +360,56 @@ function Home() {
         </div>
       </section>
 
-      <section className="bg-secondary/50 py-20">
+      <section className="bg-secondary/40 py-20 relative overflow-hidden">
         <div className="container-page">
-          <span className="eyebrow">Benefits</span>
-          <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">
-            Everything a young player needs to keep improving
-          </h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {benefits.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="card-soft p-6">
-                <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <Icon className="size-5" />
-                </span>
-                <h3 className="mt-4 text-lg">{title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{text}</p>
-              </div>
-            ))}
+          <div className="max-w-2xl">
+            <span className="eyebrow">Why Choose Us</span>
+            <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
+              Everything a young player needs to keep improving
+            </h2>
+            <p className="mt-3 text-muted-foreground text-sm sm:text-base leading-relaxed">
+              Tailored coaching methods, interactive exercises, and personal mentorship designed to build grandmaster-level intuition.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {benefits.map(
+              ({
+                icon: Icon,
+                title,
+                text,
+                badgeBg,
+                iconColor,
+                borderColor,
+                accentGlow,
+              }) => (
+                <div
+                  key={title}
+                  className={`group relative rounded-2xl border border-border/80 bg-card/95 p-6 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:bg-card hover:shadow-lg ${borderColor}`}
+                >
+                  {/* Subtle top-corner glow */}
+                  <div
+                    className={`pointer-events-none absolute -right-6 -top-6 size-24 rounded-full blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accentGlow}`}
+                  />
+
+                  {/* 3D-styled Vibrant Icon Container */}
+                  <div
+                    className={`relative grid size-12 place-items-center rounded-2xl bg-linear-to-br ${badgeBg} border border-border/50 shadow-xs transition-transform duration-300 group-hover:scale-110 group-hover:shadow-sm`}
+                  >
+                    <Icon
+                      className={`size-6 ${iconColor} transition-transform duration-300 group-hover:rotate-6`}
+                      strokeWidth={2.2}
+                    />
+                  </div>
+
+                  <h3 className="mt-5 text-base font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                    {text}
+                  </p>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </section>
