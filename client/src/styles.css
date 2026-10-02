@@ -148,26 +148,41 @@
   justify-content: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  padding: 0.8rem 1.6rem;
+  padding: 0.75rem 1.6rem;
   font-size: 0.95rem;
   font-weight: 600;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  &:active {
+    transform: scale(0.97);
+  }
 }
 
 @utility btn-primary {
   @apply btn-base;
   background-color: var(--button-green);
   color: var(--button-green-foreground);
-  box-shadow: var(--shadow-card);
-}
-
-@utility btn-primary {
+  box-shadow: 0 4px 12px oklch(0.48 0.12 138 / 20%);
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
   &:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
+    box-shadow: 0 10px 24px -4px oklch(0.48 0.12 138 / 35%);
+  }
+  &:hover::after {
+    left: 140%;
   }
 }
 
@@ -175,12 +190,25 @@
   @apply btn-base;
   background-color: var(--button-cta);
   color: var(--button-cta-foreground);
-}
-
-@utility btn-gold {
+  box-shadow: 0 4px 14px rgba(207, 123, 67, 0.25);
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
   &:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
+    box-shadow: 0 10px 25px -4px rgba(207, 123, 67, 0.45);
+  }
+  &:hover::after {
+    left: 140%;
   }
 }
 
@@ -189,11 +217,13 @@
   border: 1px solid var(--color-border);
   background-color: var(--color-card);
   color: var(--color-foreground);
-}
-
-@utility btn-outline {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   &:hover {
     background-color: var(--color-secondary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px oklch(0.25 0.05 265 / 8%);
   }
 }
 
