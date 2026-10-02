@@ -1,6 +1,6 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
 import { API_BASE_URL, apiClient } from "@/lib/api";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
   CalendarDays,
@@ -10,12 +10,15 @@ import {
   ExternalLink,
   FileText,
   Filter,
+  Globe,
+  LogOut,
   Mail,
   MessageSquare,
   Phone,
   Plus,
   RefreshCw,
   Search,
+  Shield,
   Sparkles,
   Trash2,
   UserCheck,
@@ -306,6 +309,19 @@ function AdminPage() {
     }
   }
 
+  async function handleSignOut() {
+    try {
+      await apiClient.request("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      toast.success("Signed out successfully.");
+      await navigate({ to: "/auth", replace: true });
+    } catch {
+      await navigate({ to: "/auth", replace: true });
+    }
+  }
+
   async function handleScheduleClass(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -376,29 +392,56 @@ function AdminPage() {
   });
 
   return (
-    <section className="container-page py-6 sm:py-10">
-      {/* Top Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5 mb-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="eyebrow">Administration</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Workspace
+    <div className="min-h-screen bg-background">
+      {/* Top Dedicated Admin Navigation Bar */}
+      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
+        <div className="container-page flex h-16 items-center justify-between gap-4 py-2">
+          <div className="flex items-center gap-3">
+            <Link to="/" aria-label="Unique Wellness Institute home">
+              <img
+                src="/logo.png"
+                alt="Unique Wellness Institute"
+                className="h-10 w-28 object-contain object-left"
+              />
+            </Link>
+            <div className="h-5 w-px bg-border hidden sm:block" />
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+              <Shield className="size-3.5" /> Admin Console
             </span>
           </div>
-          <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/"
+              className="btn-outline hidden sm:inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium"
+              title="View public website"
+            >
+              <Globe className="size-3.5" />
+              <span>Public Website</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setReloadKey((key) => key + 1)}
+              disabled={isLoading}
+              className="btn-outline inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium"
+            >
+              <RefreshCw className={`size-3.5 ${isLoading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              className="btn-outline inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+              title="Sign out of admin workspace"
+            >
+              <LogOut className="size-3.5" />
+              <span>Sign out</span>
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setReloadKey((key) => key + 1)}
-          disabled={isLoading}
-          className="btn-outline inline-flex items-center gap-2 text-xs sm:text-sm py-2 px-3.5"
-        >
-          <RefreshCw className={`size-3.5 sm:size-4 ${isLoading ? "animate-spin" : ""}`} />
-          Refresh Data
-        </button>
       </header>
+
+      <section className="container-page py-6 sm:py-8">
 
       {error ? (
         <div className="mt-4 border border-destructive/30 bg-destructive/10 rounded-xl px-5 py-4" role="alert">
@@ -1065,7 +1108,8 @@ function AdminPage() {
           </main>
         </div>
       )}
-    </section>
+      </section>
+    </div>
   );
 }
 

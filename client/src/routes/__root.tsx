@@ -115,19 +115,21 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
-  const isDashboard = location.pathname === "/dashboard";
+  const isDashboard = location.pathname === "/dashboard" || location.pathname.startsWith("/dashboard/");
+  const isAdmin = location.pathname === "/admin" || location.pathname.startsWith("/admin/");
+  const isCustomLayout = isDashboard || isAdmin;
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
-        {!isDashboard && <SiteHeader />}
+        {!isCustomLayout && <SiteHeader />}
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        {!isDashboard && <SiteFooter />}
+        {!isCustomLayout && <SiteFooter />}
       </div>
-      <FloatingChatWidget />
+      {!isCustomLayout && <FloatingChatWidget />}
       <Toaster />
     </QueryClientProvider>
   );
