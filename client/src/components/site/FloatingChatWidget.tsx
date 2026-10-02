@@ -208,15 +208,23 @@ export function FloatingChatWidget() {
             <button
                 type="button"
                 onClick={handleChatToggle}
-                className="relative grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                className="group relative grid size-14 place-items-center rounded-full bg-linear-to-br from-primary to-primary/90 text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl active:scale-95"
                 aria-label={isOpen ? "Close support chat" : "Open support chat"}
                 aria-expanded={isOpen}
                 title={isOpen ? "Close support chat" : "Chat with our team"}
             >
-                {isOpen ? <X className="size-6" /> : <MessageCircle className="size-6" />}
+                {/* 3D Gloss Highlight */}
+                <span className="pointer-events-none absolute inset-x-2 top-1.5 h-3 rounded-t-full bg-linear-to-b from-white/30 to-transparent" />
+
+                {isOpen ? (
+                    <X className="size-6 transition-transform duration-300 group-hover:rotate-90" />
+                ) : (
+                    <MessageCircle className="size-6 transition-transform duration-300 group-hover:scale-110" />
+                )}
+
                 {!isOpen && unreadCount > 0 && (
                     <span
-                        className="absolute -right-1 -top-1 grid min-w-6 place-items-center rounded-full bg-destructive px-1.5 py-1 text-xs font-bold text-destructive-foreground"
+                        className="absolute -right-1 -top-1 grid min-w-6 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-xs font-bold text-destructive-foreground shadow-md ring-2 ring-background animate-pulse"
                         aria-label={`${unreadCount} unread chat message${unreadCount === 1 ? "" : "s"}`}
                     >
                         {unreadCount > 99 ? "99+" : unreadCount}

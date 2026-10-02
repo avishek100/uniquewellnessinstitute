@@ -4,8 +4,9 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const nav = [
-  { to: "/prices", label: "Chess Coaching" },
-  { to: "/about", hash: "career", label: "Career Guidance" },
+  { to: "/chess-coaching", label: "Chess Coaching" },
+  { to: "/career-guidance", label: "Career Guidance" },
+  { to: "/prices", label: "Prices" },
   { to: "/founders", label: "Founder" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -61,7 +62,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="border-t border-border bg-card md:hidden">
+        <div className="border-t border-border bg-card xl:hidden">
           <div className="container-page flex flex-col gap-1 py-4">
             {nav.map((item) => (
               <Link
