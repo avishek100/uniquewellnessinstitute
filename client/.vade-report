@@ -1,0 +1,58 @@
+# Vercel Web Analytics Installation Report
+
+## Summary
+Successfully installed and configured Vercel Web Analytics for the uniquewellnessinstitute project following the latest official Vercel documentation.
+
+## Changes Implemented
+
+### 1. Package Installation
+- **Package**: `@vercel/analytics` (version 1.5.0)
+- **Package Manager**: npm
+- **Installation Command**: `npm install @vercel/analytics`
+
+### 2. Code Changes
+**Modified File**: `client/src/routes/__root.tsx`
+
+#### Added Import:
+```typescript
+import { Analytics } from "@vercel/analytics/react";
+```
+
+#### Added Analytics Component:
+Added the `<Analytics />` component to the `RootShell` function, placed inside the `<body>` tag after the `<Scripts />` component. This ensures analytics tracking is active across all pages of the application.
+
+### 3. Framework-Specific Details
+- **Framework**: TanStack Start with Vite
+- **Project Type**: React application with SSR support
+- **Integration Point**: Root shell component (`__root.tsx`)
+- **Deployment Target**: Vercel (as configured in vite.config.ts)
+
+### 4. Verification Steps Completed
+✅ Build completed successfully with no errors
+✅ Package installed and dependencies updated
+✅ Lock file (package-lock.json) properly updated
+✅ Analytics component properly integrated into the application shell
+
+## Files Modified
+1. `client/package.json` - Added @vercel/analytics dependency
+2. `client/package-lock.json` - Updated with new dependency resolution
+3. `client/src/routes/__root.tsx` - Added Analytics import and component
+
+## Next Steps for Deployment
+After deploying to Vercel:
+1. Navigate to the Analytics section in your Vercel dashboard
+2. Click the "Enable" button to activate Web Analytics
+3. Deploy the application using `vercel deploy` or through the Vercel GitHub integration
+4. Verify tracking is working by checking the browser's Network tab for requests to `/<unique-path>/view`
+5. Allow a few days for visitor data to accumulate before exploring analytics
+
+## Technical Notes
+- The Analytics component is placed in the RootShell component which wraps the entire application
+- This ensures all routes and pages are tracked automatically
+- The component is lightweight and doesn't affect page load performance
+- No environment variables are required for basic functionality
+- The integration follows React/Vite best practices as documented in the official Vercel Analytics quickstart guide
+
+## Documentation Reference
+Implementation based on: https://vercel.com/docs/analytics/quickstart
+Retrieved: October 2, 2026
