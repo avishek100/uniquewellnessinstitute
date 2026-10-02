@@ -152,7 +152,9 @@ export function ApplicationChat({
       className={
         floating
           ? "flex h-full min-h-0 flex-col p-4"
-          : "card-soft flex min-h-[25rem] flex-col p-5 sm:p-6"
+          : mode === "admin"
+            ? "card-soft flex h-[min(28rem,calc(100dvh-12rem))] min-h-[20rem] flex-col p-5 sm:p-6"
+            : "card-soft flex min-h-[25rem] flex-col p-5 sm:p-6"
       }
     >
       <header className="flex items-start justify-between gap-4 border-b border-border pb-4">

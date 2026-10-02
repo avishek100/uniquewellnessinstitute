@@ -97,6 +97,34 @@ adminRouter.get("/conversations", async (_request, response) => {
     response.json({ conversations });
 });
 
+adminRouter.delete("/conversations/:conversationId", async (request, response) => {
+    const { conversationId } = request.params;
+    const type = request.query.type;
+    if (
+        !mongoose.isValidObjectId(conversationId) ||
+        (type !== "application" && type !== "support")
+    ) {
+        response.status(400).json({ message: "Invalid conversation." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Chat is temporarily unavailable." });
+        return;
+    }
+
+    const deletedConversation =
+        type === "application"
+            ? await ChatConversation.findByIdAndDelete(conversationId)
+            : await SupportConversation.findByIdAndDelete(conversationId);
+    if (!deletedConversation) {
+        response.status(404).json({ message: "Conversation not found." });
+        return;
+    }
+
+    await ChatMessage.deleteMany({ conversationId });
+    response.status(204).end();
+});
+
 adminRouter.get("/conversations/:conversationId/messages", async (request, response) => {
     const { conversationId } = request.params;
     if (!mongoose.isValidObjectId(conversationId)) {
