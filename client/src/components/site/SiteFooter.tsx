@@ -18,7 +18,7 @@ export function SiteFooter() {
             />
           </Link>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Premier institute for international chess coaching and career guidance, empowering young minds and professionals with lifelong mastery.
+            Premium institute for chess coaching, career counseling, and wellness — built on decades of international experience.
           </p>
         </div>
 
