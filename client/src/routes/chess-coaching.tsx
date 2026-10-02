@@ -26,6 +26,33 @@ const reasons = [
 ];
 
 export const Route = createFileRoute("/chess-coaching")({
+    head: () => ({
+        meta: [
+            { title: "Best Chess Coaching Institute in Mumbai for Kids | Unique Wellness Institute" },
+            {
+                name: "description",
+                content:
+                    "Find the best chess coaching institute in Mumbai for kids ages 5–16. Join live online classes, learn in small groups, and prepare for tournaments. Book a free demo.",
+            },
+            {
+                name: "keywords",
+                content:
+                    "best chess coaching institute Mumbai, top chess academy for kids, online chess coaching for children, live chess classes India, beginner chess lessons for kids, small group chess classes, chess tournament coaching, chess training for ages 5 to 16, free chess demo Mumbai",
+            },
+            {
+                property: "og:title",
+                content: "Best Chess Coaching Institute in Mumbai for Kids | Unique Wellness Institute",
+            },
+            {
+                property: "og:description",
+                content:
+                    "Live online chess classes for kids ages 5–16, small groups, and tournament preparation. Book a free demo class.",
+            },
+            { property: "og:url", content: "https://uniquewellnessinstitute.com/chess-coaching" },
+            { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
+        ],
+        links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/chess-coaching" }],
+    }),
     component: ChessCoachingPage,
 });
 
@@ -41,7 +68,7 @@ function ChessCoachingPage() {
                 <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
                     <div>
                         <h1 className="max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
-                            International chess coaching for kids 5–16.
+                            Best chess coaching institute for kids ages 5–16.
                         </h1>
 
                         <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">

@@ -6,18 +6,18 @@ import { ApplicationForm } from "@/components/site/ApplicationForm";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Book a Free Demo Chess Class & Contact Us — Mumbai, India" },
+      { title: "Free Chess Demo Class | Best Chess Coaching Institute Mumbai" },
       {
         name: "description",
         content:
-          "Book a free live trial chess lesson or schedule a career guidance session. Unique Wellness Institute, Mumbai, India. Call +91 95943 73644 or email info@uniquewellnessinstitute.com.",
+          "Book a free live chess demo with Unique Wellness Institute, a chess coaching institute in Mumbai for kids ages 5–16. Call +91 95943 73644.",
       },
       {
         name: "keywords",
         content:
-          "free chess demo class, book chess trial India, contact chess academy Mumbai, chess classes phone number Mumbai, career guidance consultation India",
+          "best chess coaching institute Mumbai, free chess demo class, book chess trial India, contact chess academy Mumbai, chess classes phone number Mumbai",
       },
-      { property: "og:title", content: "Book a Free Demo Chess Class & Contact Us — Mumbai, India" },
+      { property: "og:title", content: "Free Chess Demo Class | Unique Wellness Institute Mumbai" },
       {
         property: "og:description",
         content:

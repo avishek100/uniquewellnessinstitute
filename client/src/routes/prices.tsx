@@ -5,18 +5,18 @@ import { Check } from "lucide-react";
 export const Route = createFileRoute("/prices")({
   head: () => ({
     meta: [
-      { title: "Chess Coaching Fees & Course Plans (INR) — Unique Wellness Institute Mumbai" },
+      { title: "Chess Coaching Fees & Courses | Best Chess Coaching Institute Mumbai" },
       {
         name: "description",
         content:
-          "Affordable and structured online chess courses in India. Beginner, intermediate, and advanced chess batches with transparent fees from ₹9,000 / $90. Book a demo class.",
+          "Compare fees for structured online chess courses in Mumbai, from beginner to advanced. Explore 16-session batches and book a free demo at Unique Wellness Institute.",
       },
       {
         name: "keywords",
         content:
-          "chess coaching fees India, chess course price Mumbai, online chess classes cost India, beginner chess course, tournament chess training fees",
+          "best chess coaching institute Mumbai, chess coaching fees India, chess course price Mumbai, online chess classes cost India, beginner chess course, tournament chess fees",
       },
-      { property: "og:title", content: "Chess Coaching Fees & Course Plans (INR) — Unique Wellness Institute" },
+      { property: "og:title", content: "Chess Coaching Fees & Courses | Unique Wellness Institute" },
       {
         property: "og:description",
         content:

@@ -6,18 +6,18 @@ import onlineLesson from "@/assets/online-lesson.png";
 export const Route = createFileRoute("/method")({
   head: () => ({
     meta: [
-      { title: "Our Teaching Methodology — Unique Wellness Institute Mumbai" },
+      { title: "Chess Coaching Method | Best Chess Coaching Institute Mumbai" },
       {
         name: "description",
         content:
-          "Proven chess coaching methodology: 16 live interactive sessions per course, small batches, gamified tasks, personalized feedback, and tournament guidance in India.",
+          "See the method behind our chess coaching: 16 live sessions, small groups, personal feedback, and tournament preparation for kids ages 5–16 in Mumbai.",
       },
       {
         name: "keywords",
         content:
-          "chess coaching method, live chess classes India, structured chess training, small batch chess coaching Mumbai, tournament chess preparation India",
+          "best chess coaching institute Mumbai, chess coaching method, live chess classes India, structured chess training, small batch chess coaching, tournament preparation",
       },
-      { property: "og:title", content: "Our Teaching Methodology — Unique Wellness Institute Mumbai" },
+      { property: "og:title", content: "Chess Coaching Method | Unique Wellness Institute Mumbai" },
       {
         property: "og:description",
         content:

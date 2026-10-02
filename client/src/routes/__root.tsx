@@ -72,16 +72,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Unique Wellness Institute — Chess Academy & Career Guidance Mumbai, India" },
+      { title: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
       {
         name: "description",
         content:
-          "Premier chess academy and career guidance institute based in Mumbai, India. International coach-led online chess training for kids and teenagers worldwide. Book a free demo class.",
+          "Looking for the best chess coaching institute in Mumbai? Explore live online chess classes for kids ages 5–16, structured courses, and tournament preparation.",
       },
       {
         name: "keywords",
         content:
-          "chess coaching India, online chess classes Mumbai, chess academy India, best chess coach Mumbai, international chess coaching, kids chess classes India, career counseling Mumbai, career guidance India, Unique Wellness Institute",
+          "best chess coaching institute, best chess coaching institute Mumbai, top chess coaching institute Mumbai, chess academy for kids Mumbai, chess coaching for kids in India, online chess classes for kids, live online chess lessons, beginner chess classes for children, small group chess coaching, chess tournament preparation for kids, chess coach for children India, free chess demo class, international chess coaching, career counseling Mumbai, career guidance India, Unique Wellness Institute",
       },
       { name: "geo.region", content: "IN-MH" },
       { name: "geo.placename", content: "Mumbai" },
@@ -90,19 +90,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Unique Wellness Institute" },
       { property: "og:locale", content: "en_IN" },
-      { property: "og:title", content: "Unique Wellness Institute — Chess Academy & Career Guidance Mumbai, India" },
+      { property: "og:title", content: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
       {
         property: "og:description",
         content:
-          "Premier chess academy and career guidance institute based in Mumbai, India. International coach-led online chess training for kids and teenagers worldwide.",
+          "Looking for the best chess coaching institute in Mumbai? Explore live online chess classes for kids ages 5–16, structured courses, and tournament preparation.",
       },
       { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Unique Wellness Institute — Chess Academy & Career Guidance Mumbai, India" },
+      { name: "twitter:title", content: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
       {
         name: "twitter:description",
         content:
-          "Premier chess academy and career guidance institute based in Mumbai, India. Online chess lessons and career counseling.",
+          "Live online chess classes for kids ages 5–16, structured courses, and tournament preparation in Mumbai. Book a free demo.",
       },
       { name: "twitter:image", content: "https://uniquewellnessinstitute.com/logo.png" },
     ],
@@ -115,7 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/logo.png", type: "image/png" },
-      { rel: "canonical", href: "https://uniquewellnessinstitute.com/" },
     ],
     scripts: [
       {
@@ -129,7 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           logo: "https://uniquewellnessinstitute.com/logo.png",
           image: "https://uniquewellnessinstitute.com/logo.png",
           description:
-            "International chess coaching and career guidance institute based in Mumbai, India, offering live online lessons for children and adults globally.",
+            "Chess coaching and career guidance institute based in Mumbai, India, offering live online lessons for children ages 5–16, structured courses, and tournament preparation.",
           telephone: "+91-9594373644",
           email: "info@uniquewellnessinstitute.com",
           priceRange: "₹₹",

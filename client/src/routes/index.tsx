@@ -33,21 +33,24 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Unique Wellness Institute — Chess & Career Guidance" },
+      { title: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
       {
         name: "description",
         content:
-          "International chess coaching and career guidance from Unique Wellness Institute. Explore programs and book a consultation.",
+          "Searching for the best chess coaching institute in Mumbai? Explore live chess classes for kids ages 5–16, small groups, tournament preparation, and a free demo.",
       },
       {
         property: "og:title",
-        content: "Unique Wellness Institute — Chess & Career Guidance",
+        content: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute",
       },
       {
         property: "og:description",
         content:
-          "Chess coaching and career guidance, delivered with care and backed by decades of international experience.",
+          "Live online chess classes for kids ages 5–16, small groups, tournament preparation, and a free demo in Mumbai.",
       },
+    ],
+    links: [
+      { rel: "canonical", href: "https://uniquewellnessinstitute.com/" },
     ],
   }),
   component: Home,
