@@ -27,18 +27,22 @@ export function setSessionCookie(response: Response, userId: string): boolean {
     return true;
 }
 
-export function setAdminSessionCookie(response: Response, email: string): boolean {
+export function createAdminSessionToken(email: string): string | undefined {
     const secret = process.env.JWT_SECRET;
     const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!secret || secret.length < 32 || !adminPassword) return false;
+    if (!secret || secret.length < 32 || !adminPassword) return undefined;
+
+    const credentialVersion = createHmac("sha256", secret).update(adminPassword).digest("hex");
+    return jwt.sign({ sub: email, role: "admin", email, credentialVersion }, secret, {
+        expiresIn: `${sessionDurationDays}d`,
+    });
+}
+
+export function setAdminSessionCookie(response: Response, email: string): boolean {
+    const token = createAdminSessionToken(email);
+    if (!token) return false;
 
     const isProduction = process.env.NODE_ENV === "production";
-    const credentialVersion = createHmac("sha256", secret).update(adminPassword).digest("hex");
-    const token = jwt.sign(
-        { sub: email, role: "admin", email, credentialVersion },
-        secret,
-        { expiresIn: `${sessionDurationDays}d` },
-    );
     response.cookie(sessionCookieName, token, {
         httpOnly: true,
         secure: isProduction,
@@ -83,6 +87,12 @@ export function getAdminSession(token: string | undefined): { email: string } | 
     } catch {
         return undefined;
     }
+}
+
+export function getBearerTokenFromHeader(header: string | undefined): string | undefined {
+    if (!header) return undefined;
+    const match = /^Bearer\s+(.+)$/i.exec(header.trim());
+    return match?.[1] || undefined;
 }
 
 export function clearSessionCookie(response: Response): void {

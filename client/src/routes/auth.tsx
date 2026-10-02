@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api";
+import { apiClient, setAdminSessionToken } from "@/lib/api";
 import { authSessionQueryKey, type AuthSessionUser } from "@/lib/auth-session";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -9,6 +9,7 @@ type AuthResponse = {
   message?: string;
   isAdmin?: boolean;
   user?: AuthSessionUser;
+  token?: string;
 };
 
 export const Route = createFileRoute("/auth")({
@@ -52,8 +53,13 @@ function AuthPage() {
     try {
       const result = await requestAuth(mode === "signup" ? "signup" : "login", payload);
       const signedInAsAdmin = result.isAdmin === true;
-      if (!signedInAsAdmin && result.user) {
-        queryClient.setQueryData(authSessionQueryKey, result.user);
+      if (signedInAsAdmin) {
+        setAdminSessionToken(result.token ?? null);
+      } else {
+        setAdminSessionToken(null);
+        if (result.user) {
+          queryClient.setQueryData(authSessionQueryKey, result.user);
+        }
       }
       toast.success(
         signedInAsAdmin

@@ -12,6 +12,7 @@ import {
 } from "../schemas/auth.js";
 import {
     clearSessionCookie,
+    createAdminSessionToken,
     getSessionUserId,
     isSessionConfigured,
     sessionCookieName,
@@ -86,9 +87,11 @@ authRouter.post("/login", authRateLimit, async (request, response) => {
     }
     if (adminLogin.status === "valid") {
         setAdminSessionCookie(response, adminLogin.email);
+        const adminToken = createAdminSessionToken(adminLogin.email);
         response.json({
             user: { fullName: "Administrator", email: adminLogin.email },
             isAdmin: true,
+            token: adminToken ?? undefined,
         });
         return;
     }

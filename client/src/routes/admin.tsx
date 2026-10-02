@@ -1,5 +1,5 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
-import { API_BASE_URL, apiClient } from "@/lib/api";
+import { API_BASE_URL, apiClient, setAdminSessionToken } from "@/lib/api";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -315,9 +315,11 @@ function AdminPage() {
         method: "POST",
         credentials: "include",
       });
-      toast.success("Signed out successfully.");
-      await navigate({ to: "/auth", replace: true });
     } catch {
+      // ignore logout failures and proceed to clear the stored admin token
+    } finally {
+      setAdminSessionToken(null);
+      toast.success("Signed out successfully.");
       await navigate({ to: "/auth", replace: true });
     }
   }

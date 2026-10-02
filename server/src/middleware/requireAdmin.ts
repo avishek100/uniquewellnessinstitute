@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { getAdminSession, sessionCookieName } from "../utils/session.js";
+import { getAdminSession, getBearerTokenFromHeader, sessionCookieName } from "../utils/session.js";
 
 export const requireAdmin: RequestHandler = async (request, response, next) => {
     if (!process.env.ADMIN_EMAIL?.trim() || !process.env.ADMIN_PASSWORD) {
@@ -7,7 +7,11 @@ export const requireAdmin: RequestHandler = async (request, response, next) => {
         return;
     }
 
-    const admin = getAdminSession(request.cookies?.[sessionCookieName]);
+    const bearerToken = getBearerTokenFromHeader(request.headers.authorization);
+    const admin =
+        getAdminSession(request.cookies?.[sessionCookieName]) ||
+        getAdminSession(bearerToken);
+
     if (!admin) {
         response.status(401).json({ message: "Please sign in with an admin account." });
         return;
