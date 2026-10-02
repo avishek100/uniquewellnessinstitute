@@ -1,0 +1,153 @@
+{
+  "planHash": "284d7ed46b50b3e767020fdaefe7cd009136b45ec09888ec346910cc64cdc72f",
+  "phase": "postupgrade",
+  "recordedAtUtc": "2026-10-02T07:33:58.0189540Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "vite-dependency-resolves",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "",
+        "durationMs": 97
+      },
+      {
+        "name": "production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E build\r\n\u003E vite build\r\n\r\n\u001B[90m[\u001B[90mnitro:vercel\u001B[90m]\u001B[39m \u001B[36mi\u001B[39m Using \u001B[36mnodejs22.x\u001B[39m runtime.\r\n\u001B[90m[\u001B[90mnitro:vercel\u001B[90m]\u001B[39m \u001B[36mi\u001B[39m Using \u001B[36mweb\u001B[39m entry format.\r\n[nitro] build:before: 13.256ms\r\n[nitro] rollup:before: 0.159ms\r\n\u001B[33mThe plugin \u0022vite-tsconfig-paths\u0022 is detected. Vite now supports tsconfig paths resolution natively via the \u001B[1mresolve.tsconfigPaths\u001B[22m option. You can remove the plugin and set \u001B[1mresolve.tsconfigPaths: true\u001B[22m in your Vite config instead.\u001B[39m\r\n\u001B[36mvite v8.3.2 \u001B[32mbuilding client environment for production...\u001B[36m\u001B[39m\r\n\u001B[2K\r\ntransforming...\u2713 4086 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\n.vercel/output/static/assets/omkar-CoxRdr4X.png              5.64 kB\r\n.vercel/output/static/assets/dharmandra-DnrWiKTK.png        14.76 kB\r\n.vercel/output/static/assets/ajayhonda-Csekhr3V.png         16.26 kB\r\n.vercel/output/static/assets/google-TcSi4t4Z.png           739.03 kB\r\n.vercel/output/static/assets/online-lesson-DeaYsM8q.png  2,105.88 kB\r\n.vercel/output/static/assets/murnalkore-Br0qFIY3.png     2,263.19 kB\r\n.vercel/output/static/assets/styles--WodP-NZ.css            91.06 kB \u2502 gzip:  15.61 kB\r\n.vercel/output/static/assets/index-ClV1g08d.js             729.67 kB \u2502 gzip: 223.06 kB\r\n\r\n\u001B[32m\u2713 built in 2.41s\u001B[39m\r\n\u001B[33m[plugin builtin:vite-reporter] \r\n(!) Some chunks are larger than 500 kB after minification. Consider:\r\n- Using dynamic import() to code-split the application\r\n- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\r\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001B[39m\r\n\u001B[36mvite v8.3.2 \u001B[32mbuilding ssr environment for production...\u001B[36m\u001B[39m\r\n\u001B[2K\r\ntransforming...\u2713 88 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\nnode_modules/.nitro/vite/services/ssr/assets/omkar-CoxRdr4X.png                          5.64 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/dharmandra-DnrWiKTK.png                    14.76 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/ajayhonda-Csekhr3V.png                     16.26 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/google-TcSi4t4Z.png                       739.03 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/online-lesson-DeaYsM8q.png              2,105.88 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/murnalkore-Br0qFIY3.png                 2,263.19 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/styles--WodP-NZ.css                        91.06 kB \u2502 gzip: 15.61 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-D9UWiqvJ.js           0.22 kB \u2502 gzip:  0.16 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-CtA2-zrh.js      0.51 kB \u2502 gzip:  0.34 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/start-DDdqLQMM.js                           1.56 kB \u2502 gzip:  0.70 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/createCsrfMiddleware-xuZnLSS7.js            3.18 kB \u2502 gzip:  1.01 kB\r\nnode_modules/.nitro/vite/services/ssr/index.js                                           4.61 kB \u2502 gzip:  1.92 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/server-CNYgVvIe.js                         66.34 kB \u2502 gzip: 16.95 kB\r\nnode_modules/.nitro/vite/services/ssr/assets/router-BaGOTg3c.js                        175.11 kB \u2502 gzip: 37.06 kB\r\n\r\n\u001B[32m\u2713 built in 543ms\u001B[39m\r\n\u001B[90m[\u001B[90mnitro\u001B[90m]\u001B[39m \u001B[35mo\u001B[39m Building [\u001B[35mNitro\u001B[39m] \u001B[2m(preset: \u001B[36mvercel\u001B[39m, compatibility: \u001B[36m2026-10-02\u001B[39m)\u001B[22m\r\n\u001B[90m[\u001B[90mnitro\u001B[90m]\u001B[39m \u001B[32m\u221A\u001B[39m Generated public \u001B[36m.vercel/output/static\u001B[39m\r\n[nitro] prerender:routes: 0.015ms\r\n\u001B[36mvite v8.3.2 \u001B[32mbuilding nitro environment for production...\u001B[36m\u001B[39m\r\n\u001B[2K\r\ntransforming...\u2713 2258 modules transformed.\r\n\u001B[36mi\u001B[39m Tracing dependencies:\r\n- \u001B[36mtslib\u001B[39m (2.8.1)\r\n\u001B[32m\u221A\u001B[39m Traced 1 dependencies (4 files) in 86ms.\r\n\u001B[36mi\u001B[39m Ensure your production environment matches the builder OS and architecture (\u001B[36mwin32-x64\u001B[39m) to avoid native module issues.\r\nrendering chunks...\r\ncomputing gzip size...\r\n.ver\n\u2026[truncated]",
+        "durationMs": 11010
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E test\r\n\u003E node --experimental-strip-types --test --test-reporter=tap\r\n\r\nTAP version 13\r\n# (node:21360) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\r\n# (Use \u0060node --trace-warnings ...\u0060 to show where the warning was created)\r\n# Subtest: chess course catalog includes all three levels and their fees\r\nok 1 - chess course catalog includes all three levels and their fees\r\n  ---\r\n  duration_ms: 2.4917\r\n  ...\r\n1..1\r\n# tests 1\r\n# suites 0\r\n# pass 1\r\n# fail 0\r\n# cancelled 0\r\n# skipped 0\r\n# todo 0\r\n# duration_ms 210.8817\r\n",
+        "durationMs": 1007,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "homepage-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!DOCTYPE html\u003E\u003Chtml lang=\u0022en\u0022 data-tsd-source=\u0022C:/Users/avish/Desktop/uniquewellnessinstitute/client/src/routes/__root.tsx:228:5\u0022\u003E\u003Chead data-tsd-source=\u0022C:/Users/avish/Desktop/uniquewellnessinstitute/client/src/routes/__root.tsx:229:7\u0022\u003E\u003Cmeta charSet=\u0022utf-8\u0022/\u003E\u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/logo.png\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/@fs/c:/Users/avish/Desktop/uniquewellnessinstitute/client/src/assets/online-lesson.png\u0022 fetchPriority=\u0022high\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/@fs/c:/Users/avish/Desktop/uniquewellnessinstitute/client/src/assets/ajayhonda.png\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format\u0026amp;fit=crop\u0026amp;w=200\u0026amp;q=80\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format\u0026amp;fit=crop\u0026amp;w=200\u0026amp;q=80\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/@fs/c:/Users/avish/Desktop/uniquewellnessinstitute/client/src/assets/omkar.png\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format\u0026amp;fit=crop\u0026amp;w=200\u0026amp;q=80\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/@fs/c:/Users/avish/Desktop/uniquewellnessinstitute/client/src/assets/dharmandra.png\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/@fs/c:/Users/avish/Desktop/uniquewellnessinstitute/client/src/assets/google.png\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/src/styles.css\u0022 data-precedence=\u0022default\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700\u0026amp;family=Barlow\u002BCondensed:wght@400;500;600;700\u0026amp;display=swap\u0022 data-precedence=\u0022default\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/@tanstack-start/styles.css?routes=__root__%2C%2F\u0022 data-tanstack-router-dev-styles=\u0022true\u0022 data-precedence=\u0022default\u0022/\u003E\u003Ctitle\u003EBest Chess Coaching Institute in Mumbai | Unique Wellness Institute\u003C/title\u003E\u003Cmeta name=\u0022keywords\u0022 content=\u0022best chess coaching institute, best chess coaching institute Mumbai, top chess coaching institute Mumbai, chess academy for kids Mumbai, chess coaching for kids in India, online chess classes for kids, live online chess lessons, beginner chess classes for children, small group chess coaching, chess tournament preparation for kids, chess coach for children India, free chess demo class, international chess coaching, career counseling Mumbai, career guidance India, Unique Wellness Institute\u0022/\u003E\u003Cmeta name=\u0022geo.region\u0022 content=\u0022IN-MH\u0022/\u003E\u003Cmeta name=\u0022geo.placename\u0022 content=\u0022Mumbai\u0022/\u003E\u003Cmeta name=\u0022geo.position\u0022 content=\u002219.0760;72.8777\u0022/\u003E\u003Cmeta name=\u0022ICBM\u0022 content=\u002219.0760, 72.8777\u0022/\u003E\u003Cmeta property=\u0022og:type\u0022 content=\u0022website\u0022/\u003E\u003Cmeta property=\u0022og:site_name\u0022 content=\u0022Unique Wellness Institute\u0022/\u003E\u003Cmeta property=\u0022og:locale\u0022 content=\u0022en_IN\u0022/\u003E\u003Cmeta property=\u0022og:image\u0022 content=\u0022https://uniquewellnessinstitute.com/logo.png\u0022/\u003E\u003Cmeta name=\u0022twitter:card\u0022 content=\u0022summary_large_image\u0022/\u003E\u003Cmeta name=\u0022twitter:title\u0022 content=\u0022Best Chess Coaching Institute in Mumbai | Unique Wellness Institute\u0022/\u003E\u003Cmeta name=\u0022twitter:description\u0022 content=\u0022Live online chess classes for kids ages 5\u201316, structured courses, and tournament preparation in Mumbai. Book a free demo.\u0022/\u003E\u003Cmeta name=\u0022twitter:image\u0022 content=\u0022https://uniquewellnessinstitute.com/logo.png\u0022/\u003E\u003Cmeta name=\u0022description\u0022 content=\u0022Searching for the best chess coaching institute in Mumbai? Explore live chess classes for kids ages 5\u201316, small groups, tournament preparation, and a free demo.\u0022/\u003E\u003Cmeta property=\u0022og:title\u0022 content=\u0022Best Chess Coaching Institute in Mumbai | Unique Wellness Institute\u0022/\u003E\u003Cmeta property=\u0022og:description\u0022 content=\u0022Live online chess classes for kids ages 5\u201316, small groups, tournament preparation, and a free demo in Mumbai.\u0022/\u003E\u003Clink rel=\u0022modulepreload\u0022 href=\u0022/@id/virtual:tanstack-start-dev-client-entry\u0022/\u003E\u003Clink rel=\u0022preconnect\u0022 href=\u0022https://fonts.googleapis.com\u0022/\u003E\u003Clink rel=\u0022preconnect\u0022 href=\u0022https://fonts.gstatic.com\u0022 crossorigin=\u0022anonymous\u0022/\u003E\u003Clink rel=\u0022icon\u0022 href=\u0022/logo.png\u0022 type=\u0022image/png\u0022/\u003E\u003Clink rel=\u0022canonical\u0022 href=\u0022https://uniquewellnessinstitute.co\n\u2026[truncated]",
+        "durationMs": 6371
+      },
+      {
+        "name": "chess-coaching-route-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!DOCTYPE html\u003E\u003Chtml lang=\u0022en\u0022 data-tsd-source=\u0022C:/Users/avish/Desktop/uniquewellnessinstitute/client/src/routes/__root.tsx:228:5\u0022\u003E\u003Chead data-tsd-source=\u0022C:/Users/avish/Desktop/uniquewellnessinstitute/client/src/routes/__root.tsx:229:7\u0022\u003E\u003Cmeta charSet=\u0022utf-8\u0022/\u003E\u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022image\u0022 href=\u0022/logo.png\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/src/styles.css\u0022 data-precedence=\u0022default\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700\u0026amp;family=Barlow\u002BCondensed:wght@400;500;600;700\u0026amp;display=swap\u0022 data-precedence=\u0022default\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/@tanstack-start/styles.css?routes=__root__%2C%2Fchess-coaching\u0022 data-tanstack-router-dev-styles=\u0022true\u0022 data-precedence=\u0022default\u0022/\u003E\u003Ctitle\u003EBest Chess Coaching Institute in Mumbai for Kids | Unique Wellness Institute\u003C/title\u003E\u003Cmeta name=\u0022geo.region\u0022 content=\u0022IN-MH\u0022/\u003E\u003Cmeta name=\u0022geo.placename\u0022 content=\u0022Mumbai\u0022/\u003E\u003Cmeta name=\u0022geo.position\u0022 content=\u002219.0760;72.8777\u0022/\u003E\u003Cmeta name=\u0022ICBM\u0022 content=\u002219.0760, 72.8777\u0022/\u003E\u003Cmeta property=\u0022og:type\u0022 content=\u0022website\u0022/\u003E\u003Cmeta property=\u0022og:site_name\u0022 content=\u0022Unique Wellness Institute\u0022/\u003E\u003Cmeta property=\u0022og:locale\u0022 content=\u0022en_IN\u0022/\u003E\u003Cmeta name=\u0022twitter:card\u0022 content=\u0022summary_large_image\u0022/\u003E\u003Cmeta name=\u0022twitter:title\u0022 content=\u0022Best Chess Coaching Institute in Mumbai | Unique Wellness Institute\u0022/\u003E\u003Cmeta name=\u0022twitter:description\u0022 content=\u0022Live online chess classes for kids ages 5\u201316, structured courses, and tournament preparation in Mumbai. Book a free demo.\u0022/\u003E\u003Cmeta name=\u0022twitter:image\u0022 content=\u0022https://uniquewellnessinstitute.com/logo.png\u0022/\u003E\u003Cmeta name=\u0022description\u0022 content=\u0022Find the best chess coaching institute in Mumbai for kids ages 5\u201316. Join live online classes, learn in small groups, and prepare for tournaments. Book a free demo.\u0022/\u003E\u003Cmeta name=\u0022keywords\u0022 content=\u0022best chess coaching institute Mumbai, top chess academy for kids, online chess coaching for children, live chess classes India, beginner chess lessons for kids, small group chess classes, chess tournament coaching, chess training for ages 5 to 16, free chess demo Mumbai\u0022/\u003E\u003Cmeta property=\u0022og:title\u0022 content=\u0022Best Chess Coaching Institute in Mumbai for Kids | Unique Wellness Institute\u0022/\u003E\u003Cmeta property=\u0022og:description\u0022 content=\u0022Live online chess classes for kids ages 5\u201316, small groups, and tournament preparation. Book a free demo class.\u0022/\u003E\u003Cmeta property=\u0022og:url\u0022 content=\u0022https://uniquewellnessinstitute.com/chess-coaching\u0022/\u003E\u003Cmeta property=\u0022og:image\u0022 content=\u0022https://uniquewellnessinstitute.com/logo.png\u0022/\u003E\u003Clink rel=\u0022modulepreload\u0022 href=\u0022/@id/virtual:tanstack-start-dev-client-entry\u0022/\u003E\u003Clink rel=\u0022preconnect\u0022 href=\u0022https://fonts.googleapis.com\u0022/\u003E\u003Clink rel=\u0022preconnect\u0022 href=\u0022https://fonts.gstatic.com\u0022 crossorigin=\u0022anonymous\u0022/\u003E\u003Clink rel=\u0022icon\u0022 href=\u0022/logo.png\u0022 type=\u0022image/png\u0022/\u003E\u003Clink rel=\u0022canonical\u0022 href=\u0022https://uniquewellnessinstitute.com/chess-coaching\u0022/\u003E\u003Cscript type=\u0022application/ld\u002Bjson\u0022\u003E{\u0022@context\u0022:\u0022https://schema.org\u0022,\u0022@type\u0022:[\u0022EducationalOrganization\u0022,\u0022SportsClub\u0022,\u0022LocalBusiness\u0022],\u0022name\u0022:\u0022Unique Wellness Institute\u0022,\u0022alternateName\u0022:[\u0022UWI Chess Academy\u0022,\u0022Unique Wellness Institute Mumbai\u0022],\u0022url\u0022:\u0022https://uniquewellnessinstitute.com\u0022,\u0022logo\u0022:\u0022https://uniquewellnessinstitute.com/logo.png\u0022,\u0022image\u0022:\u0022https://uniquewellnessinstitute.com/logo.png\u0022,\u0022description\u0022:\u0022Chess coaching and career guidance institute based in Mumbai, India, offering live online lessons for children ages 5\u201316, structured courses, and tournament preparation.\u0022,\u0022telephone\u0022:\u0022\u002B91-9594373644\u0022,\u0022email\u0022:\u0022info@uniquewellnessinstitute.com\u0022,\u0022priceRange\u0022:\u0022\u20B9\u20B9\u0022,\u0022currenciesAccepted\u0022:\u0022INR, USD, GBP, EUR, AED\u0022,\u0022paymentAccepted\u0022:\u0022Credit Card, Debit Card, UPI, Net Banking, Bank Transfer\u0022,\u0022address\u0022:{\u0022@type\u0022:\u0022PostalAddress\u0022,\u0022addressLocality\u0022:\u0022Mumbai\u0022,\u0022addressRegion\u0022:\u0022Maharashtra\u0022,\u0022addressCountry\u0022:\u0022IN\u0022},\u0022geo\u0022:{\u0022@type\u0022:\u0022GeoCoordinates\u0022,\u0022latitude\u0022:19.076,\u0022longitude\u0022:72.8777},\u0022areaServed\u0022:[{\u0022@type\u0022:\u0022Country\u0022,\u0022name\u0022:\u0022India\u0022},{\u0022@type\u0022:\u0022Country\u0022,\u0022name\u0022:\u0022United States\u0022},{\u0022@type\u0022:\u0022Country\u0022,\u0022name\u0022:\u0022United Kingdom\u0022},{\u0022@type\u0022:\u0022Country\u0022,\u0022name\u0022:\u0022Uni\n\u2026[truncated]",
+        "durationMs": 6262
+      }
+    ],
+    "executions": [
+      {
+        "source": "vite-dependency-resolves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "args": [
+          "-e",
+          "require.resolve(\u0027vite/package.json\u0027)"
+        ],
+        "cwd": "c:\\Users\\avish\\Desktop\\uniquewellnessinstitute\\client",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "c:\\Users\\avish\\Desktop\\uniquewellnessinstitute\\client",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "c:\\Users\\avish\\Desktop\\uniquewellnessinstitute\\client",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "homepage-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "args": [
+          "node_modules/vite/bin/vite.js",
+          "dev",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "4173"
+        ],
+        "cwd": "c:\\Users\\avish\\Desktop\\uniquewellnessinstitute\\client",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "chess-coaching-route-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "args": [
+          "node_modules/vite/bin/vite.js",
+          "dev",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "4173"
+        ],
+        "cwd": "c:\\Users\\avish\\Desktop\\uniquewellnessinstitute\\client",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}
