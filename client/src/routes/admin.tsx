@@ -396,22 +396,22 @@ function AdminPage() {
     <div className="min-h-screen bg-background">
       {/* Top Dedicated Admin Navigation Bar */}
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
-        <div className="container-page flex h-16 items-center justify-between gap-4 py-2">
-          <div className="flex items-center gap-3">
-            <Link to="/" aria-label="Unique Wellness Institute home">
+        <div className="container-page flex h-16 items-center justify-between gap-2 py-2 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <Link to="/" aria-label="Unique Wellness Institute home" className="shrink-0">
               <img
                 src="/logo.png"
                 alt="Unique Wellness Institute"
-                className="h-10 w-28 object-contain object-left"
+                className="h-8 w-24 object-contain object-left sm:h-10 sm:w-28"
               />
             </Link>
-            <div className="h-5 w-px bg-border hidden sm:block" />
+            <div className="hidden h-5 w-px bg-border sm:block" />
             <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
               <Shield className="size-3.5" /> Admin Console
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <Link
               to="/"
               className="btn-outline hidden sm:inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium"
@@ -424,7 +424,7 @@ function AdminPage() {
               type="button"
               onClick={() => setReloadKey((key) => key + 1)}
               disabled={isLoading}
-              className="btn-outline inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium"
+              className="btn-outline inline-flex items-center gap-1.5 text-[11px] py-1.5 px-2.5 font-medium sm:text-xs sm:px-3"
             >
               <RefreshCw className={`size-3.5 ${isLoading ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -432,7 +432,7 @@ function AdminPage() {
             <button
               type="button"
               onClick={() => void handleSignOut()}
-              className="btn-outline inline-flex items-center gap-1.5 text-xs py-1.5 px-3 font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+              className="btn-outline inline-flex items-center gap-1.5 text-[11px] py-1.5 px-2.5 font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/30 sm:text-xs sm:px-3"
               title="Sign out of admin workspace"
             >
               <LogOut className="size-3.5" />
@@ -458,15 +458,15 @@ function AdminPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
             {/* Left Sidebar Navigation */}
-            <aside className="card-soft rounded-2xl p-3 border border-border/80 lg:sticky lg:top-24 shadow-sm">
-              <nav className="flex flex-row lg:flex-col gap-1.5" aria-label="Admin Navigation">
+            <aside className="card-soft rounded-2xl p-2 border border-border/80 lg:sticky lg:top-24 shadow-sm">
+              <nav className="flex flex-row gap-1.5 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible" aria-label="Admin Navigation">
                 {/* Applications Navigation Item */}
                 <button
                   type="button"
                   onClick={() => setActiveSection("applications")}
-                  className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${activeSection === "applications"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                  className={`flex min-w-[140px] flex-1 items-center justify-between gap-2 px-3 py-3 rounded-xl text-sm font-medium transition-all lg:min-w-0 ${activeSection === "applications"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     }`}
                 >
                   <span className="flex items-center gap-2.5 truncate">
@@ -479,8 +479,8 @@ function AdminPage() {
                     )}
                     <span
                       className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${activeSection === "applications"
-                          ? "bg-primary-foreground/20 text-primary-foreground"
-                          : "bg-muted text-foreground"
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-foreground"
                         }`}
                     >
                       {applications.length}
@@ -492,9 +492,9 @@ function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("messages")}
-                  className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${activeSection === "messages"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                  className={`flex min-w-[140px] flex-1 items-center justify-between gap-2 px-3 py-3 rounded-xl text-sm font-medium transition-all lg:min-w-0 ${activeSection === "messages"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     }`}
                 >
                   <span className="flex items-center gap-2.5 truncate">
@@ -512,8 +512,8 @@ function AdminPage() {
                     )}
                     <span
                       className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${activeSection === "messages"
-                          ? "bg-primary-foreground/20 text-primary-foreground"
-                          : "bg-muted text-foreground"
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-foreground"
                         }`}
                     >
                       {conversations.length}
@@ -525,9 +525,9 @@ function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("classes")}
-                  className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${activeSection === "classes"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                  className={`flex min-w-[140px] flex-1 items-center justify-between gap-2 px-3 py-3 rounded-xl text-sm font-medium transition-all lg:min-w-0 ${activeSection === "classes"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     }`}
                 >
                   <span className="flex items-center gap-2.5 truncate">
@@ -536,8 +536,8 @@ function AdminPage() {
                   </span>
                   <span
                     className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${activeSection === "classes"
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-muted text-foreground"
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-muted text-foreground"
                       }`}
                   >
                     {upcomingClassesCount}
@@ -636,8 +636,8 @@ function AdminPage() {
                             type="button"
                             onClick={() => setStatusFilter(status)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-all ${statusFilter === status
-                                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                                : "bg-muted/70 text-muted-foreground hover:bg-muted hover:text-foreground"
+                              ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                              : "bg-muted/70 text-muted-foreground hover:bg-muted hover:text-foreground"
                               }`}
                           >
                             {status} ({count})
@@ -687,9 +687,9 @@ function AdminPage() {
                               </div>
 
                               {/* Status Selector & Delete */}
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 self-start sm:self-auto">
                                 <select
-                                  className="field text-xs py-1.5 px-2.5 font-medium"
+                                  className="field min-w-[120px] text-xs py-1.5 px-2.5 font-medium"
                                   value={status}
                                   onChange={(e) =>
                                     void handleUpdateApplicationStatus(
@@ -709,7 +709,7 @@ function AdminPage() {
                                   type="button"
                                   onClick={() => void handleDeleteApplication(application._id)}
                                   title="Delete application"
-                                  className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                  className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                                 >
                                   <Trash2 className="size-4" />
                                 </button>
@@ -877,8 +877,8 @@ function AdminPage() {
                               key={conversation._id}
                               onClick={() => selectConversation(conversation._id)}
                               className={`group relative flex items-start justify-between p-3.5 cursor-pointer transition-colors ${isSelected
-                                  ? "bg-primary/10 border-l-4 border-l-primary"
-                                  : "hover:bg-muted/60"
+                                ? "bg-primary/10 border-l-4 border-l-primary"
+                                : "hover:bg-muted/60"
                                 }`}
                             >
                               <div className="min-w-0 flex-1 pr-2">
