@@ -16,7 +16,7 @@ import {
   Users,
   Video,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ajayHonda from "@/assets/ajayhonda.png";
 import dharmandra from "@/assets/dharmandra.png";
@@ -219,8 +219,28 @@ const googleReviews = [
 const googleReviewsUrl =
   "https://www.google.com/maps/search/?api=1&query=Unique%20Wellness%20Institute";
 
+const rotatingPhrases = [
+  "International Coaches",
+  "Career Mentors",
+  "Tournament Champions",
+];
+
 function Home() {
   const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsFading(true);
+      setTimeout(() => {
+        setPhraseIndex((prev) => (prev + 1) % rotatingPhrases.length);
+        setIsFading(false);
+      }, 300);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleReview = (reviewId: string) => {
     setExpandedReviews((current) => ({
@@ -246,8 +266,17 @@ function Home() {
               <span>Chess · Career Mentorship — All In One</span>
             </div>
 
-            <h1 className="hero-heading-fade mt-6 max-w-2xl text-5xl leading-[0.98] sm:text-6xl lg:text-7xl font-bold tracking-tight uppercase">
-              Grow with <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent drop-shadow-xs">international coaching</span>
+            <h1 className="mt-6 max-w-2xl text-5xl leading-[1.05] sm:text-6xl lg:text-7xl font-bold tracking-tight uppercase">
+              <span>Grow with </span>
+              <span
+                className={`inline-block text-primary transition-all duration-300 transform ${
+                  isFading
+                    ? "opacity-0 translate-y-3 blur-xs"
+                    : "opacity-100 translate-y-0 blur-0"
+                }`}
+              >
+                {rotatingPhrases[phraseIndex]}
+              </span>
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-foreground/80">
@@ -275,42 +304,20 @@ function Home() {
                   <Star key={starIndex} className="size-4.5 fill-current" />
                 ))}
               </span>
-              <span className="font-bold text-white">4.9 / 5</span>
+              <span className="font-bold text-black">4.9 / 5</span>
               <span className="text-ink-foreground/70 font-medium">· 100+ Verified Google Reviews</span>
             </div>
           </div>
 
-          <div className="relative group">
-            {/* Glow frame */}
-            <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-linear-to-r from-primary/30 to-amber-500/20 blur-xl opacity-60 transition-opacity duration-500 group-hover:opacity-100" />
-
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 p-2 backdrop-blur-sm shadow-2xl">
-              <img
-                src={onlineLesson}
-                alt="Student learning chess in a live online lesson"
-                width={1200}
-                height={912}
-                fetchPriority="high"
-                className="aspect-[0.83] w-full rounded-2xl object-contain shadow-lift transition-transform duration-500 group-hover:scale-[1.02]"
-              />
-
-              {/* Floating Top-Right Glass Badge */}
-              <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 backdrop-blur-xl shadow-xl text-white text-xs font-semibold">
-                <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                <span>Top Rated Academy</span>
-              </div>
-
-              {/* Floating Bottom-Left Glass Card */}
-              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3 rounded-2xl border border-white/20 bg-black/70 p-3 backdrop-blur-xl shadow-2xl text-white">
-                <div className="grid size-10 place-items-center rounded-xl bg-linear-to-br from-amber-500 to-yellow-500 text-white shadow-md">
-                  <Trophy className="size-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold leading-tight">Live Interactive Batches</p>
-                  <p className="text-[11px] text-white/70">Ages 5–16 · Global Timezones</p>
-                </div>
-              </div>
-            </div>
+          <div className="relative">
+            <img
+              src={onlineLesson}
+              alt="Student learning chess in a live online lesson"
+              width={1200}
+              height={912}
+              fetchPriority="high"
+              className="aspect-[0.83] w-full rounded-lg object-contain shadow-lift"
+            />
           </div>
         </div>
       </section>
@@ -430,7 +437,7 @@ function Home() {
               <div className="flex items-center justify-between gap-4 sm:justify-end">
                 <div className="flex items-center gap-2 text-xs text-foreground">
                   <Star className="size-4 fill-[#d27c4b] text-[#d27c4b]" />
-                  <span className="font-semibold">4.9 / 5</span>
+                  <span className="font-semibold text-black">4.9 / 5</span>
                   <span className="text-muted-foreground">· 100+ Google reviews</span>
                 </div>
                 <div className="flex gap-2">
