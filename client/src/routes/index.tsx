@@ -231,51 +231,86 @@ function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-ink text-ink-foreground">
-        <div className="container-page grid gap-12 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 lg:py-24">
+      <section className="relative overflow-hidden bg-ink text-ink-foreground py-16 lg:py-24">
+        {/* Ambient Mesh Glows */}
+        <div className="pointer-events-none absolute -left-32 -top-32 size-[450px] rounded-full bg-primary/20 blur-[130px]" />
+        <div className="pointer-events-none absolute -bottom-32 right-0 size-[400px] rounded-full bg-amber-500/15 blur-[120px]" />
+
+        <div className="container-page relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
           <div>
-            <span className="eyebrow text-primary">
-              Chess · Career Guidance — all under one roof
-            </span>
-            <h1 className="hero-heading-fade mt-5 max-w-2xl text-5xl leading-[0.98] sm:text-6xl lg:text-7xl uppercase">
-              Grow with <span className="text-primary">international coaching</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-4 py-1 text-xs font-semibold text-primary backdrop-blur-md shadow-xs">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+              </span>
+              <span>Chess · Career Mentorship — All In One</span>
+            </div>
+
+            <h1 className="hero-heading-fade mt-6 max-w-2xl text-5xl leading-[0.98] sm:text-6xl lg:text-7xl font-bold tracking-tight uppercase">
+              Grow with <span className="bg-linear-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent drop-shadow-xs">international coaching</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-foreground/75">
-              Unique Wellness Institute pairs world-class chess coaching with career mentorship,
-              built on decades of cross-industry experience.
+
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-foreground/80">
+              Unique Wellness Institute pairs world-class chess coaching with personalized career mentorship, built on decades of international master experience.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact" className="btn-gold">
-                Book Demo Class <ArrowRight className="size-4" />
+              <Link to="/contact" className="btn-gold group">
+                <Sparkles className="size-4 transition-transform group-hover:rotate-12" />
+                <span>Book Free Demo</span>
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/"
                 hash="services"
-                className="btn-base border border-ink-foreground/25 text-ink-foreground hover:bg-ink-foreground/10"
+                className="btn-base border border-ink-foreground/25 bg-white/5 text-ink-foreground backdrop-blur-sm transition-all hover:bg-white/15 hover:border-white/40 hover:-translate-y-0.5"
               >
                 Explore Services
               </Link>
             </div>
+
             <div className="mt-8 flex items-center gap-3 text-sm">
-              <span className="flex gap-0.5 text-accent" aria-label="Rated 4.9 out of 5">
+              <span className="flex gap-0.5 text-amber-400" aria-label="Rated 4.9 out of 5">
                 {Array.from({ length: 5 }, (_, starIndex) => (
-                  <Star key={starIndex} className="size-4 fill-current" />
+                  <Star key={starIndex} className="size-4.5 fill-current" />
                 ))}
               </span>
-              <span className="font-semibold">4.9 / 5</span>
-              <span className="text-ink-foreground/65">· 100+ Google reviews</span>
+              <span className="font-bold text-white">4.9 / 5</span>
+              <span className="text-ink-foreground/70 font-medium">· 100+ Verified Google Reviews</span>
             </div>
           </div>
 
-          <div className="relative">
-            <img
-              src={onlineLesson}
-              alt="Student learning chess in a live online lesson"
-              width={1200}
-              height={912}
-              fetchPriority="high"
-              className="aspect-[0.83] w-full rounded-lg object-contain shadow-lift"
-            />
+          <div className="relative group">
+            {/* Glow frame */}
+            <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-linear-to-r from-primary/30 to-amber-500/20 blur-xl opacity-60 transition-opacity duration-500 group-hover:opacity-100" />
+
+            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 p-2 backdrop-blur-sm shadow-2xl">
+              <img
+                src={onlineLesson}
+                alt="Student learning chess in a live online lesson"
+                width={1200}
+                height={912}
+                fetchPriority="high"
+                className="aspect-[0.83] w-full rounded-2xl object-contain shadow-lift transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+
+              {/* Floating Top-Right Glass Badge */}
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 backdrop-blur-xl shadow-xl text-white text-xs font-semibold">
+                <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                <span>Top Rated Academy</span>
+              </div>
+
+              {/* Floating Bottom-Left Glass Card */}
+              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3 rounded-2xl border border-white/20 bg-black/70 p-3 backdrop-blur-xl shadow-2xl text-white">
+                <div className="grid size-10 place-items-center rounded-xl bg-linear-to-br from-amber-500 to-yellow-500 text-white shadow-md">
+                  <Trophy className="size-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold leading-tight">Live Interactive Batches</p>
+                  <p className="text-[11px] text-white/70">Ages 5–16 · Global Timezones</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
