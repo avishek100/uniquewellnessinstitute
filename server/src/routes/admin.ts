@@ -1,5 +1,6 @@
 import { Router } from "express";
 import mongoose from "mongoose";
+import { z } from "zod";
 import { requireAdmin } from "../middleware/requireAdmin.js";
 import { Application } from "../models/Application.js";
 import { ChatConversation } from "../models/ChatConversation.js";
@@ -42,6 +43,25 @@ adminRouter.post("/classes", async (request, response) => {
     response.status(201).json({ scheduledClass });
 });
 
+adminRouter.delete("/classes/:classId", async (request, response) => {
+    const { classId } = request.params;
+    if (!mongoose.isValidObjectId(classId)) {
+        response.status(400).json({ message: "Invalid class ID." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Class schedules are temporarily unavailable." });
+        return;
+    }
+
+    const deleted = await ScheduledClass.findByIdAndDelete(classId);
+    if (!deleted) {
+        response.status(404).json({ message: "Class not found." });
+        return;
+    }
+    response.status(200).json({ message: "Class deleted successfully." });
+});
+
 const conversationPipeline: mongoose.PipelineStage[] = [
     { $sort: { lastMessageAt: -1 } },
     {
@@ -79,6 +99,58 @@ adminRouter.get("/applications", async (_request, response) => {
     response.json({ applications });
 });
 
+const updateApplicationSchema = z.object({
+    status: z.enum(["pending", "reviewed", "contacted", "enrolled", "rejected"]).optional(),
+    notes: z.string().trim().max(2000).optional(),
+});
+
+adminRouter.patch("/applications/:applicationId", async (request, response) => {
+    const { applicationId } = request.params;
+    if (!mongoose.isValidObjectId(applicationId)) {
+        response.status(400).json({ message: "Invalid application ID." });
+        return;
+    }
+    const parsed = updateApplicationSchema.safeParse(request.body);
+    if (!parsed.success) {
+        response.status(400).json({ message: "Invalid application data." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Application data is temporarily unavailable." });
+        return;
+    }
+
+    const updated = await Application.findByIdAndUpdate(
+        applicationId,
+        { $set: parsed.data },
+        { new: true },
+    ).lean();
+    if (!updated) {
+        response.status(404).json({ message: "Application not found." });
+        return;
+    }
+    response.status(200).json({ application: updated });
+});
+
+adminRouter.delete("/applications/:applicationId", async (request, response) => {
+    const { applicationId } = request.params;
+    if (!mongoose.isValidObjectId(applicationId)) {
+        response.status(400).json({ message: "Invalid application ID." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Application data is temporarily unavailable." });
+        return;
+    }
+
+    const deleted = await Application.findByIdAndDelete(applicationId);
+    if (!deleted) {
+        response.status(404).json({ message: "Application not found." });
+        return;
+    }
+    response.status(200).json({ message: "Application deleted successfully." });
+});
+
 adminRouter.get("/conversations", async (_request, response) => {
     if (mongoose.connection.readyState !== 1) {
         response.status(503).json({ message: "Chat is temporarily unavailable." });
@@ -97,6 +169,28 @@ adminRouter.get("/conversations", async (_request, response) => {
     response.json({ conversations });
 });
 
+adminRouter.delete("/conversations/:conversationId", async (request, response) => {
+    const { conversationId } = request.params;
+    if (!mongoose.isValidObjectId(conversationId)) {
+        response.status(400).json({ message: "Invalid conversation." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Chat is temporarily unavailable." });
+        return;
+    }
+
+    const appConv = await ChatConversation.findByIdAndDelete(conversationId);
+    const suppConv = appConv ? null : await SupportConversation.findByIdAndDelete(conversationId);
+    if (!appConv && !suppConv) {
+        response.status(404).json({ message: "Conversation not found." });
+        return;
+    }
+
+    await ChatMessage.deleteMany({ conversationId });
+    response.status(200).json({ message: "Conversation deleted successfully." });
+});
+
 adminRouter.get("/conversations/:conversationId/messages", async (request, response) => {
     const { conversationId } = request.params;
     if (!mongoose.isValidObjectId(conversationId)) {
@@ -113,4 +207,30 @@ adminRouter.get("/conversations/:conversationId/messages", async (request, respo
 
     const messages = await ChatMessage.find({ conversationId }).sort({ createdAt: 1 }).lean();
     response.json({ messages });
+});
+
+adminRouter.delete("/messages/:messageId", async (request, response) => {
+    const { messageId } = request.params;
+    if (!mongoose.isValidObjectId(messageId)) {
+        response.status(400).json({ message: "Invalid message ID." });
+        return;
+    }
+    if (mongoose.connection.readyState !== 1) {
+        response.status(503).json({ message: "Chat is temporarily unavailable." });
+        return;
+    }
+
+    const deletedMessage = await ChatMessage.findByIdAndDelete(messageId);
+    if (!deletedMessage) {
+        response.status(404).json({ message: "Message not found." });
+        return;
+    }
+
+    const lastMsg = await ChatMessage.findOne({ conversationId: deletedMessage.conversationId }).sort({ createdAt: -1 });
+    if (lastMsg) {
+        await ChatConversation.findByIdAndUpdate(deletedMessage.conversationId, { lastMessageAt: lastMsg.createdAt });
+        await SupportConversation.findByIdAndUpdate(deletedMessage.conversationId, { lastMessageAt: lastMsg.createdAt });
+    }
+
+    response.status(200).json({ message: "Message deleted successfully.", conversationId: deletedMessage.conversationId });
 });

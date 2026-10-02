@@ -11,6 +11,12 @@ const applicationSchema = new mongoose.Schema(
         phone: { type: String, trim: true, required: true },
         email: { type: String, trim: true, lowercase: true, required: true },
         message: { type: String, trim: true, maxlength: 2000 },
+        status: {
+            type: String,
+            enum: ["pending", "reviewed", "contacted", "enrolled", "rejected"],
+            default: "pending",
+        },
+        notes: { type: String, trim: true, maxlength: 2000, default: "" },
     },
     { timestamps: true, versionKey: false },
 );

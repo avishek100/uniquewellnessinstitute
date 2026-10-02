@@ -1,8 +1,9 @@
 import { API_BASE_URL, apiClient } from "@/lib/api";
 import { Link } from "@tanstack/react-router";
-import { Send, X } from "lucide-react";
+import { Send, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io, type Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 type ChatMessage = {
   _id: string;
@@ -19,6 +20,7 @@ type ChatPanelProps = {
   visitorName?: string;
   floating?: boolean;
   onClose?: () => void;
+  onMessageDeleted?: () => void;
 };
 
 export function ApplicationChat({
@@ -28,11 +30,13 @@ export function ApplicationChat({
   visitorName,
   floating = false,
   onClose,
+  onMessageDeleted,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState("Connecting...");
   const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -116,8 +120,30 @@ export function ApplicationChat({
   }, [chatToken, conversationId, mode]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "nearest" });
+    endRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [messages]);
+
+  async function handleDeleteMessage(messageId: string) {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    setDeletingId(messageId);
+    try {
+      const response = await apiClient.request(`/api/admin/messages/${messageId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const res = (await response.json().catch(() => ({}))) as { message?: string };
+        throw new Error(res.message || "Failed to delete message.");
+      }
+      setMessages((current) => current.filter((m) => m._id !== messageId));
+      toast.success("Message deleted.");
+      onMessageDeleted?.();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete message.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -140,23 +166,34 @@ export function ApplicationChat({
       className={
         floating
           ? "flex h-full min-h-0 flex-col p-4"
-          : "card-soft flex min-h-[25rem] flex-col p-5 sm:p-6"
+          : "card-soft flex h-[480px] max-h-[520px] flex-col rounded-xl border border-border/80 p-4 sm:p-5 shadow-sm"
       }
     >
-      <header className="flex items-start justify-between gap-4 border-b border-border pb-4">
+      <header className="flex items-center justify-between gap-4 border-b border-border pb-3">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-base font-semibold sm:text-lg">
             {mode === "admin" ? visitorName || "Applicant chat" : "Chat with our team"}
           </h2>
-          <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-            {status}
-          </p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span
+              className={`size-2 rounded-full ${
+                status === "Connected"
+                  ? "bg-emerald-500"
+                  : status === "Connecting..." || status === "Reconnecting..."
+                    ? "bg-amber-500 animate-pulse"
+                    : "bg-muted-foreground"
+              }`}
+            />
+            <p className="text-xs text-muted-foreground" aria-live="polite">
+              {status}
+            </p>
+          </div>
         </div>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="grid size-9 shrink-0 place-items-center text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             aria-label="Close chat"
           >
             <X className="size-4" />
@@ -164,34 +201,63 @@ export function ApplicationChat({
         )}
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto py-4" aria-live="polite">
+      <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto py-3 pr-1 text-sm" aria-live="polite">
         {messages.length === 0 && !error && (
-          <p className="my-auto text-center text-sm text-muted-foreground">
+          <p className="my-auto text-center text-xs sm:text-sm text-muted-foreground">
             Send a message to start the conversation.
           </p>
         )}
         {messages.map((message) => {
           const isOwnMessage = mode === message.sender;
           return (
-            <article
+            <div
               key={message._id}
-              className={`max-w-[88%] px-3 py-2 ${isOwnMessage ? "self-end bg-primary text-primary-foreground" : "self-start bg-muted"
-                }`}
+              className={`group flex items-end gap-1.5 ${isOwnMessage ? "justify-end" : "justify-start"}`}
             >
-              <p className="text-[11px] font-semibold">
-                {message.sender === "admin" ? "Administration" : message.senderName}
-              </p>
-              <p className="mt-1 whitespace-pre-wrap break-words text-sm">{message.body}</p>
-              <time className="mt-1 block text-right text-[10px] opacity-70">
-                {new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(
-                  new Date(message.createdAt),
-                )}
-              </time>
-            </article>
+              {mode === "admin" && isOwnMessage && (
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteMessage(message._id)}
+                  disabled={deletingId === message._id}
+                  title="Delete message"
+                  className="mb-1 rounded p-1 text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              )}
+              <article
+                className={`relative max-w-[85%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm ${
+                  isOwnMessage
+                    ? "bg-primary text-primary-foreground rounded-br-sm"
+                    : "bg-muted/80 text-foreground rounded-bl-sm"
+                }`}
+              >
+                <p className="text-[10px] font-semibold opacity-80 mb-0.5">
+                  {message.sender === "admin" ? "Administration" : message.senderName}
+                </p>
+                <p className="whitespace-pre-wrap break-words leading-relaxed">{message.body}</p>
+                <time className="mt-1 block text-right text-[9px] opacity-70">
+                  {new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(
+                    new Date(message.createdAt),
+                  )}
+                </time>
+              </article>
+              {mode === "admin" && !isOwnMessage && (
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteMessage(message._id)}
+                  disabled={deletingId === message._id}
+                  title="Delete message"
+                  className="mb-1 rounded p-1 text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              )}
+            </div>
           );
         })}
         {error && (
-          <p className="text-sm text-destructive" role="alert">
+          <p className="text-xs text-destructive bg-destructive/10 p-2 rounded" role="alert">
             {error}{" "}
             {error.includes("Sign in") && (
               <Link to="/auth" className="font-semibold underline">
@@ -203,13 +269,13 @@ export function ApplicationChat({
         <div ref={endRef} />
       </div>
 
-      <form className="flex items-end gap-2 border-t border-border pt-4" onSubmit={handleSubmit}>
+      <form className="flex items-center gap-2 border-t border-border pt-3" onSubmit={handleSubmit}>
         <label className="sr-only" htmlFor={`chat-message-${conversationId}`}>
           Message
         </label>
         <textarea
           id={`chat-message-${conversationId}`}
-          className="field min-h-11 flex-1 resize-y"
+          className="field min-h-10 max-h-24 flex-1 resize-none py-2 text-xs sm:text-sm"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           maxLength={2000}
@@ -223,7 +289,7 @@ export function ApplicationChat({
           }}
         />
         <button
-          className="btn-primary grid size-11 shrink-0 place-items-center p-0"
+          className="btn-primary grid size-10 shrink-0 place-items-center rounded-lg p-0"
           type="submit"
           aria-label="Send message"
           title="Send message"

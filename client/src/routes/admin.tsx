@@ -1,12 +1,35 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
 import { API_BASE_URL, apiClient } from "@/lib/api";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
+import {
+  AlertCircle,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Edit3,
+  ExternalLink,
+  FileText,
+  Filter,
+  Mail,
+  MessageSquare,
+  Phone,
+  Plus,
+  RefreshCw,
+  Search,
+  Sparkles,
+  Trash2,
+  UserCheck,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
 
-type Application = {
+export type ApplicationStatus = "pending" | "reviewed" | "contacted" | "enrolled" | "rejected";
+
+export type Application = {
   _id: string;
   studentType: "adult" | "child";
   childName?: string;
@@ -17,10 +40,12 @@ type Application = {
   phone: string;
   email: string;
   message?: string;
+  status?: ApplicationStatus;
+  notes?: string;
   createdAt: string;
 };
 
-type Conversation = {
+export type Conversation = {
   _id: string;
   type?: "application" | "support";
   visitorName: string;
@@ -34,7 +59,7 @@ type Conversation = {
   };
 };
 
-type ScheduledClass = {
+export type ScheduledClass = {
   _id: string;
   title: string;
   startsAt: string;
@@ -80,6 +105,14 @@ function AdminPage() {
   const [isSavingClass, setIsSavingClass] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState("");
   const [conversationSearch, setConversationSearch] = useState("");
+  
+  // Application filters
+  const [applicationSearch, setApplicationSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
+  const [currentNotes, setCurrentNotes] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
@@ -160,18 +193,118 @@ function AdminPage() {
     });
   }
 
-  const selectedConversation = conversations.find(
-    (conversation) => conversation._id === selectedConversationId,
-  );
-  const filteredConversations = conversations.filter((conversation) => {
-    const query = conversationSearch.trim().toLowerCase();
-    return (
-      !query ||
-      conversation.visitorName.toLowerCase().includes(query) ||
-      conversation.visitorEmail.toLowerCase().includes(query) ||
-      conversation.lastMessage?.body.toLowerCase().includes(query)
-    );
-  });
+  // Status updates for applications
+  async function handleUpdateApplicationStatus(applicationId: string, newStatus: ApplicationStatus) {
+    try {
+      const response = await apiClient.request(`/api/admin/applications/${applicationId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        application?: Application;
+        message?: string;
+      };
+      if (!response.ok || !result.application) {
+        throw new Error(result.message ?? "Could not update status.");
+      }
+      setApplications((current) =>
+        current.map((app) => (app._id === applicationId ? { ...app, status: newStatus } : app)),
+      );
+      toast.success(`Application marked as ${newStatus}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update application status.");
+    }
+  }
+
+  // Save notes for application
+  async function handleSaveNotes(applicationId: string) {
+    try {
+      const response = await apiClient.request(`/api/admin/applications/${applicationId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: currentNotes }),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        application?: Application;
+        message?: string;
+      };
+      if (!response.ok || !result.application) {
+        throw new Error(result.message ?? "Could not save notes.");
+      }
+      setApplications((current) =>
+        current.map((app) => (app._id === applicationId ? { ...app, notes: currentNotes } : app)),
+      );
+      setEditingNotesId(null);
+      toast.success("Admin notes saved.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save notes.");
+    }
+  }
+
+  // Delete application
+  async function handleDeleteApplication(applicationId: string) {
+    if (!window.confirm("Are you sure you want to delete this application permanently?")) return;
+    try {
+      const response = await apiClient.request(`/api/admin/applications/${applicationId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const res = (await response.json().catch(() => ({}))) as { message?: string };
+        throw new Error(res.message ?? "Could not delete application.");
+      }
+      setApplications((current) => current.filter((app) => app._id !== applicationId));
+      toast.success("Application deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete application.");
+    }
+  }
+
+  // Delete conversation
+  async function handleDeleteConversation(conversationId: string, event?: React.MouseEvent) {
+    event?.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this conversation and all its messages?")) return;
+    try {
+      const response = await apiClient.request(`/api/admin/conversations/${conversationId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const res = (await response.json().catch(() => ({}))) as { message?: string };
+        throw new Error(res.message ?? "Could not delete conversation.");
+      }
+      setConversations((current) => current.filter((c) => c._id !== conversationId));
+      if (selectedConversationId === conversationId) {
+        setSelectedConversationId("");
+        selectedConversationIdRef.current = "";
+      }
+      toast.success("Conversation deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete conversation.");
+    }
+  }
+
+  // Delete class
+  async function handleDeleteClass(classId: string) {
+    if (!window.confirm("Are you sure you want to delete this scheduled class?")) return;
+    try {
+      const response = await apiClient.request(`/api/admin/classes/${classId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const res = (await response.json().catch(() => ({}))) as { message?: string };
+        throw new Error(res.message ?? "Could not delete class.");
+      }
+      setScheduledClasses((current) => current.filter((c) => c._id !== classId));
+      toast.success("Scheduled class deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete scheduled class.");
+    }
+  }
 
   async function handleScheduleClass(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -206,349 +339,768 @@ function AdminPage() {
     }
   }
 
+  // Application filtering
+  const filteredApplications = applications.filter((app) => {
+    const query = applicationSearch.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      (app.name && app.name.toLowerCase().includes(query)) ||
+      (app.childName && app.childName.toLowerCase().includes(query)) ||
+      (app.parentName && app.parentName.toLowerCase().includes(query)) ||
+      app.email.toLowerCase().includes(query) ||
+      app.phone.includes(query) ||
+      (app.message && app.message.toLowerCase().includes(query)) ||
+      (app.notes && app.notes.toLowerCase().includes(query));
+
+    const matchesStatus = statusFilter === "all" || (app.status || "pending") === statusFilter;
+    const matchesType = typeFilter === "all" || app.studentType === typeFilter;
+
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  const pendingApplicationsCount = applications.filter((app) => !app.status || app.status === "pending").length;
+  const enrolledApplicationsCount = applications.filter((app) => app.status === "enrolled").length;
+  const upcomingClassesCount = scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now()).length;
+
+  const selectedConversation = conversations.find(
+    (conversation) => conversation._id === selectedConversationId,
+  );
+  const filteredConversations = conversations.filter((conversation) => {
+    const query = conversationSearch.trim().toLowerCase();
+    return (
+      !query ||
+      conversation.visitorName.toLowerCase().includes(query) ||
+      conversation.visitorEmail.toLowerCase().includes(query) ||
+      conversation.lastMessage?.body.toLowerCase().includes(query)
+    );
+  });
+
   return (
-    <section className="container-page py-10 sm:py-14">
-      <header className="flex flex-wrap items-end justify-between gap-5 border-b border-border pb-7">
+    <section className="container-page py-6 sm:py-10">
+      {/* Top Header */}
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5 mb-6">
         <div>
-          <span className="eyebrow">Administration</span>
-          <h1 className="mt-3 text-3xl sm:text-4xl">Admin workspace</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Review submitted applications and reply to families in real time.
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="eyebrow">Administration</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live Workspace
+            </span>
+          </div>
+          <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight">Admin Dashboard</h1>
         </div>
         <button
           type="button"
           onClick={() => setReloadKey((key) => key + 1)}
           disabled={isLoading}
-          className="btn-outline inline-flex items-center gap-2"
+          className="btn-outline inline-flex items-center gap-2 text-xs sm:text-sm py-2 px-3.5"
         >
-          <RefreshCw className={`size-4 ${isLoading ? "animate-spin" : ""}`} />
-          Refresh
+          <RefreshCw className={`size-3.5 sm:size-4 ${isLoading ? "animate-spin" : ""}`} />
+          Refresh Data
         </button>
       </header>
 
       {error ? (
-        <div className="mt-8 border border-accent bg-accent/20 px-5 py-4" role="alert">
-          <p className="font-semibold">Admin access unavailable</p>
+        <div className="mt-4 border border-destructive/30 bg-destructive/10 rounded-xl px-5 py-4" role="alert">
+          <div className="flex items-center gap-2 text-destructive font-semibold">
+            <AlertCircle className="size-5" />
+            <p>Admin access unavailable</p>
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">{error}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Check the server&apos;s <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code>{" "}
-            settings.
+          <p className="mt-2 text-xs text-muted-foreground">
+            Check the server&apos;s <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code> settings.
           </p>
         </div>
       ) : (
-        <>
-          <div
-            className="mt-6 flex gap-1 border-b border-border"
-            role="tablist"
-            aria-label="Admin sections"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSection === "applications"}
-              onClick={() => setActiveSection("applications")}
-              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "applications"
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+        <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
+          {/* Left Sidebar Navigation */}
+          <aside className="card-soft rounded-2xl p-3 border border-border/80 lg:sticky lg:top-24 shadow-sm">
+            <nav className="flex flex-row lg:flex-col gap-1.5" aria-label="Admin Navigation">
+              {/* Applications Navigation Item */}
+              <button
+                type="button"
+                onClick={() => setActiveSection("applications")}
+                className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeSection === "applications"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                 }`}
-            >
-              Applications <span className="ml-1.5 text-xs">{applications.length}</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSection === "messages"}
-              onClick={() => setActiveSection("messages")}
-              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "messages"
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+              >
+                <span className="flex items-center gap-2.5 truncate">
+                  <FileText className="size-4 shrink-0" />
+                  <span>Applications</span>
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {pendingApplicationsCount > 0 && activeSection !== "applications" && (
+                    <span className="size-2 rounded-full bg-amber-500" title={`${pendingApplicationsCount} pending`} />
+                  )}
+                  <span
+                    className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${
+                      activeSection === "applications"
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    {applications.length}
+                  </span>
+                </div>
+              </button>
+
+              {/* Messages Navigation Item */}
+              <button
+                type="button"
+                onClick={() => setActiveSection("messages")}
+                className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeSection === "messages"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                 }`}
-            >
-              Messages <span className="ml-1.5 text-xs">{conversations.length}</span>
-              {unreadConversationIds.size > 0 && (
+              >
+                <span className="flex items-center gap-2.5 truncate">
+                  <MessageSquare className="size-4 shrink-0" />
+                  <span>Messages</span>
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {unreadConversationIds.size > 0 && (
+                    <span
+                      className="inline-grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground animate-pulse"
+                      title={`${unreadConversationIds.size} unread`}
+                    >
+                      {unreadConversationIds.size > 99 ? "99+" : unreadConversationIds.size}
+                    </span>
+                  )}
+                  <span
+                    className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${
+                      activeSection === "messages"
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    {conversations.length}
+                  </span>
+                </div>
+              </button>
+
+              {/* Live Classes Navigation Item */}
+              <button
+                type="button"
+                onClick={() => setActiveSection("classes")}
+                className={`flex flex-1 lg:flex-initial items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeSection === "classes"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                }`}
+              >
+                <span className="flex items-center gap-2.5 truncate">
+                  <Video className="size-4 shrink-0" />
+                  <span>Live Classes</span>
+                </span>
                 <span
-                  className="ml-2 inline-grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"
-                  aria-label={`${unreadConversationIds.size} unread conversation${unreadConversationIds.size === 1 ? "" : "s"}`}
+                  className={`inline-grid min-w-5.5 place-items-center rounded-full px-2 py-0.5 text-xs font-bold ${
+                    activeSection === "classes"
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-muted text-foreground"
+                  }`}
                 >
-                  {unreadConversationIds.size > 99 ? "99+" : unreadConversationIds.size}
+                  {upcomingClassesCount}
                 </span>
-              )}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeSection === "classes"}
-              onClick={() => setActiveSection("classes")}
-              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "classes"
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              Live Classes <span className="ml-1.5 text-xs">{scheduledClasses.length}</span>
-            </button>
-          </div>
+              </button>
+            </nav>
 
-          {activeSection === "applications" ? (
-            <section className="pt-8" aria-labelledby="applications-heading" role="tabpanel">
-              <div className="mb-4 flex items-end justify-between gap-4">
-                <div>
-                  <span className="eyebrow">Applications</span>
-                  <h2 id="applications-heading" className="mt-2 text-2xl">
-                    Submitted applications
-                  </h2>
+            {/* Quick overview widget in sidebar for desktop */}
+            <div className="hidden lg:block mt-6 pt-5 border-t border-border/60 px-2">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-3">
+                Quick Summary
+              </span>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>Pending review</span>
+                  <span className="font-semibold text-amber-600 dark:text-amber-400">{pendingApplicationsCount}</span>
                 </div>
-                <span className="text-sm text-muted-foreground" aria-live="polite">
-                  {applications.length} total
-                </span>
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>Enrolled students</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{enrolledApplicationsCount}</span>
+                </div>
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>Upcoming classes</span>
+                  <span className="font-semibold text-foreground">{upcomingClassesCount}</span>
+                </div>
               </div>
+            </div>
+          </aside>
 
-              {isLoading ? (
-                <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                  Loading applications...
-                </p>
-              ) : applications.length ? (
-                <div className="divide-y divide-border border-y border-border">
-                  {applications.map((application) => (
-                    <ApplicationDetails key={application._id} application={application} />
-                  ))}
+          {/* Main Content Workspace */}
+          <main className="min-w-0">
+            {activeSection === "applications" && (
+              <section aria-labelledby="applications-heading" className="space-y-6">
+                {/* Stats row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                  <div className="card-soft p-4 rounded-xl border border-border/80">
+                    <p className="text-xs text-muted-foreground font-medium">Total Applications</p>
+                    <p className="text-2xl font-bold mt-1">{applications.length}</p>
+                  </div>
+                  <div className="card-soft p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                    <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Pending Review</p>
+                    <p className="text-2xl font-bold mt-1 text-amber-600 dark:text-amber-400">{pendingApplicationsCount}</p>
+                  </div>
+                  <div className="card-soft p-4 rounded-xl border border-border/80">
+                    <p className="text-xs text-muted-foreground font-medium">Contacted</p>
+                    <p className="text-2xl font-bold mt-1">
+                      {applications.filter((a) => a.status === "contacted" || a.status === "reviewed").length}
+                    </p>
+                  </div>
+                  <div className="card-soft p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Enrolled</p>
+                    <p className="text-2xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">{enrolledApplicationsCount}</p>
+                  </div>
                 </div>
-              ) : (
-                <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                  No applications have been submitted yet.
-                </p>
-              )}
-            </section>
-          ) : activeSection === "messages" ? (
-            <section className="pt-8" aria-labelledby="messages-heading" role="tabpanel">
-              <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <span className="eyebrow">Live support</span>
-                  <h2 id="messages-heading" className="mt-2 text-2xl">
-                    Applicant messages
-                  </h2>
-                </div>
-                <label className="relative block w-full sm:max-w-xs">
-                  <span className="sr-only">Search conversations</span>
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    className="field pl-9"
-                    type="search"
-                    value={conversationSearch}
-                    onChange={(event) => setConversationSearch(event.target.value)}
-                    placeholder="Search name, email, message"
-                  />
-                </label>
-              </div>
 
-              {isLoading ? (
-                <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                  Loading conversations...
-                </p>
-              ) : conversations.length ? (
-                <div className="grid min-h-[32rem] gap-6 xl:grid-cols-[minmax(15rem,0.65fr)_minmax(0,1.35fr)]">
-                  <div className="max-h-[42rem] divide-y divide-border overflow-y-auto border-y border-border">
-                    {filteredConversations.map((conversation) => (
-                      <button
-                        key={conversation._id}
-                        type="button"
-                        onClick={() => selectConversation(conversation._id)}
-                        aria-pressed={conversation._id === selectedConversationId}
-                        className={`block w-full px-3 py-4 text-left transition-colors hover:bg-muted ${conversation._id === selectedConversationId ? "bg-muted" : ""
-                          }`}
+                {/* Filters and search header */}
+                <div className="card-soft p-4 rounded-xl border border-border/80 space-y-3.5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="relative flex-1 min-w-[220px]">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        className="field pl-9 text-xs sm:text-sm py-2"
+                        type="search"
+                        value={applicationSearch}
+                        onChange={(e) => setApplicationSearch(e.target.value)}
+                        placeholder="Search student, parent, email, phone, notes..."
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="field text-xs py-2 px-2.5"
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        aria-label="Filter by student type"
                       >
-                        <span className="flex items-center gap-2 text-sm font-semibold">
-                          <MessageCircle className="size-4 shrink-0 text-primary" />
-                          <span className="truncate">{conversation.visitorName}</span>
-                          {unreadConversationIds.has(conversation._id) && (
-                            <span
-                              className="size-2 shrink-0 rounded-full bg-destructive"
-                              aria-label="Unread messages"
-                            />
-                          )}
-                        </span>
-                        <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
-                          {conversation.lastMessage?.body ?? conversation.visitorEmail}
-                        </span>
-                        <span className="mt-2 flex items-center justify-between gap-2 pl-6 text-[11px] text-muted-foreground">
-                          <span>
-                            {conversation.type === "support" ? "Website chat" : "Application"}
-                          </span>
-                          <time>
-                            {new Intl.DateTimeFormat(undefined, {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            }).format(new Date(conversation.lastMessageAt))}
-                          </time>
-                        </span>
-                      </button>
-                    ))}
-                    {!filteredConversations.length && (
-                      <p className="px-4 py-8 text-sm text-muted-foreground">
-                        No conversations match that search.
-                      </p>
-                    )}
+                        <option value="all">All Types (Adult & Child)</option>
+                        <option value="child">Child Only</option>
+                        <option value="adult">Adult Only</option>
+                      </select>
+                    </div>
                   </div>
 
-                  {selectedConversation ? (
-                    <ApplicationChat
-                      key={selectedConversation._id}
-                      conversationId={selectedConversation._id}
-                      visitorName={selectedConversation.visitorName}
-                      mode="admin"
-                    />
-                  ) : (
-                    <p className="grid min-h-64 place-items-center border-y border-border text-sm text-muted-foreground">
-                      Choose a conversation to view messages.
-                    </p>
-                  )}
+                  {/* Status Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-border/60">
+                    <span className="text-xs text-muted-foreground mr-1 inline-flex items-center gap-1">
+                      <Filter className="size-3" /> Status:
+                    </span>
+                    {(["all", "pending", "reviewed", "contacted", "enrolled", "rejected"] as const).map((status) => {
+                      const count =
+                        status === "all"
+                          ? applications.length
+                          : applications.filter((a) => (a.status || "pending") === status).length;
+                      return (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => setStatusFilter(status)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-all ${
+                            statusFilter === status
+                              ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                              : "bg-muted/70 text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }`}
+                        >
+                          {status} ({count})
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              ) : (
-                <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                  No conversations yet. Website chats and application conversations will appear
-                  here.
-                </p>
-              )}
-            </section>
-          ) : (
-            <section className="pt-8" aria-labelledby="classes-heading" role="tabpanel">
-              <div className="mb-6">
-                <span className="eyebrow">Class schedule</span>
-                <h2 id="classes-heading" className="mt-2 text-2xl">Upcoming classes</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Scheduled classes are visible to all registered students.
-                </p>
-              </div>
 
-              <div className="grid items-start gap-10 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
-                <form className="grid gap-4 border-y border-border py-5" onSubmit={(event) => void handleScheduleClass(event)}>
-                  <h3 className="text-lg font-semibold">Add a class</h3>
-                  <label className="grid gap-1.5 text-sm font-medium">
-                    Class title
-                    <input className="field" name="title" required minLength={2} maxLength={120} />
-                  </label>
-                  <label className="grid gap-1.5 text-sm font-medium">
-                    Date and time
-                    <input className="field" name="startsAt" type="datetime-local" required />
-                  </label>
-                  <label className="grid gap-1.5 text-sm font-medium">
-                    Instructor
-                    <input className="field" name="instructor" maxLength={100} />
-                  </label>
-                  <label className="grid gap-1.5 text-sm font-medium">
-                    Meeting link
-                    <input className="field" name="meetingUrl" type="url" placeholder="https://..." maxLength={500} />
-                  </label>
-                  <label className="grid gap-1.5 text-sm font-medium">
-                    Details
-                    <textarea className="field min-h-24 resize-y" name="description" maxLength={1000} />
-                  </label>
-                  <button type="submit" className="btn-primary justify-self-start" disabled={isSavingClass || isLoading}>
-                    {isSavingClass ? "Adding class..." : "Add upcoming class"}
-                  </button>
-                </form>
+                {/* Applications list */}
+                {isLoading ? (
+                  <div className="card-soft p-12 text-center rounded-xl border border-border text-sm text-muted-foreground">
+                    <RefreshCw className="size-6 animate-spin mx-auto mb-2 text-primary" />
+                    Loading submitted applications...
+                  </div>
+                ) : filteredApplications.length ? (
+                  <div className="space-y-4">
+                    {filteredApplications.map((application) => {
+                      const studentName =
+                        application.studentType === "child" ? application.childName : application.name;
+                      const status = application.status || "pending";
+                      const isEditingNotes = editingNotesId === application._id;
 
-                <div>
-                  <h3 className="text-lg font-semibold">Scheduled classes</h3>
-                  {isLoading ? (
-                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">Loading class schedule...</p>
-                  ) : scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now()).length ? (
-                    <div className="mt-4 divide-y divide-border border-y border-border">
-                      {scheduledClasses
-                        .filter((item) => Date.parse(item.startsAt) > Date.now())
-                        .map((item) => (
-                          <article key={item._id} className="py-5">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <h4 className="font-semibold">{item.title}</h4>
-                              <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <CalendarDays className="size-3.5" />
-                                {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.startsAt))}
+                      return (
+                        <article
+                          key={application._id}
+                          className="card-soft rounded-2xl border border-border/80 p-5 hover:border-border transition-all shadow-xs"
+                        >
+                          {/* Top Row: Name, Status badge, Quick Actions */}
+                          <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-border/60">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2.5 flex-wrap">
+                                <h3 className="font-semibold text-base sm:text-lg">
+                                  {studentName || "Name not specified"}
+                                </h3>
+                                <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                                  {application.studentType === "child"
+                                    ? `Child${application.childAge ? ` (Age ${application.childAge})` : ""}`
+                                    : "Adult Student"}
+                                </span>
+                                <StatusBadge status={status} />
+                              </div>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <Clock className="size-3" />
+                                Submitted {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(application.createdAt))}
+                              </p>
+                            </div>
+
+                            {/* Status Selector & Delete */}
+                            <div className="flex items-center gap-2">
+                              <select
+                                className="field text-xs py-1.5 px-2.5 font-medium"
+                                value={status}
+                                onChange={(e) =>
+                                  void handleUpdateApplicationStatus(
+                                    application._id,
+                                    e.target.value as ApplicationStatus,
+                                  )
+                                }
+                                aria-label="Change status"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="reviewed">Reviewed</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="enrolled">Enrolled</option>
+                                <option value="rejected">Rejected</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteApplication(application._id)}
+                                title="Delete application"
+                                className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Contact & Student Info Grid */}
+                          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
+                            {application.studentType === "child" && (
+                              <>
+                                <div className="bg-muted/40 p-2.5 rounded-lg">
+                                  <span className="text-[11px] text-muted-foreground block">Parent / Guardian</span>
+                                  <span className="font-medium mt-0.5 block">{application.parentName || "—"}</span>
+                                </div>
+                                <div className="bg-muted/40 p-2.5 rounded-lg">
+                                  <span className="text-[11px] text-muted-foreground block">Relation</span>
+                                  <span className="font-medium mt-0.5 block">{application.relation || "—"}</span>
+                                </div>
+                              </>
+                            )}
+                            <div className="bg-muted/40 p-2.5 rounded-lg">
+                              <span className="text-[11px] text-muted-foreground block">Phone</span>
+                              <a
+                                href={`tel:${application.phone}`}
+                                className="font-medium text-primary hover:underline mt-0.5 inline-flex items-center gap-1"
+                              >
+                                <Phone className="size-3" />
+                                {application.phone}
+                              </a>
+                            </div>
+                            <div className="bg-muted/40 p-2.5 rounded-lg min-w-0">
+                              <span className="text-[11px] text-muted-foreground block">Email</span>
+                              <a
+                                href={`mailto:${application.email}`}
+                                className="font-medium text-primary hover:underline truncate mt-0.5 inline-flex items-center gap-1 max-w-full"
+                              >
+                                <Mail className="size-3 shrink-0" />
+                                <span className="truncate">{application.email}</span>
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Applicant Message */}
+                          {application.message && (
+                            <div className="mt-3.5 bg-muted/20 border border-border/60 p-3 rounded-xl text-xs sm:text-sm">
+                              <span className="text-[11px] font-semibold text-muted-foreground block mb-1">
+                                Applicant Note / Experience:
+                              </span>
+                              <p className="whitespace-pre-wrap leading-relaxed text-foreground/90">
+                                {application.message}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Admin Notes Section */}
+                          <div className="mt-3.5 pt-3 border-t border-border/50">
+                            {isEditingNotes ? (
+                              <div className="space-y-2">
+                                <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                  <Edit3 className="size-3.5 text-primary" />
+                                  Admin Notes & Call Logs:
+                                </label>
+                                <textarea
+                                  className="field text-xs sm:text-sm min-h-16 w-full"
+                                  value={currentNotes}
+                                  onChange={(e) => setCurrentNotes(e.target.value)}
+                                  placeholder="Add notes about trial schedule, skill level, phone conversation..."
+                                />
+                                <div className="flex items-center gap-2 justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingNotesId(null)}
+                                    className="btn-outline text-xs py-1 px-2.5"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => void handleSaveNotes(application._id)}
+                                    className="btn-primary text-xs py-1 px-3"
+                                  >
+                                    Save Notes
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="text-xs text-muted-foreground">
+                                  <span className="font-semibold text-foreground/80">Admin Note: </span>
+                                  {application.notes ? (
+                                    <span className="text-foreground">{application.notes}</span>
+                                  ) : (
+                                    <span className="italic">No notes recorded yet.</span>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingNotesId(application._id);
+                                    setCurrentNotes(application.notes || "");
+                                  }}
+                                  className="text-xs text-primary hover:underline shrink-0 inline-flex items-center gap-1"
+                                >
+                                  <Edit3 className="size-3" />
+                                  {application.notes ? "Edit Note" : "Add Note"}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="card-soft p-12 text-center rounded-2xl border border-border">
+                    <FileText className="size-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                    <p className="font-medium">No applications found</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {applicationSearch || statusFilter !== "all" || typeFilter !== "all"
+                        ? "Try adjusting your filters or search terms."
+                        : "Submitted applications will appear here."}
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {activeSection === "messages" && (
+              <section aria-labelledby="messages-heading" className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 id="messages-heading" className="text-xl sm:text-2xl font-bold">
+                      Live Messages & Support
+                    </h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Real-time chats with visitors and applicants.
+                    </p>
+                  </div>
+                  <div className="relative w-full sm:w-64">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      className="field pl-9 text-xs sm:text-sm py-2 w-full"
+                      type="search"
+                      value={conversationSearch}
+                      onChange={(event) => setConversationSearch(event.target.value)}
+                      placeholder="Search messages..."
+                    />
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <div className="card-soft p-12 text-center rounded-xl border border-border text-sm text-muted-foreground">
+                    <RefreshCw className="size-6 animate-spin mx-auto mb-2 text-primary" />
+                    Loading conversations...
+                  </div>
+                ) : conversations.length ? (
+                  <div className="grid gap-5 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)] items-start">
+                    {/* Left: Compact Conversations List */}
+                    <div className="card-soft rounded-xl border border-border/80 overflow-hidden divide-y divide-border/60 max-h-[480px] overflow-y-auto">
+                      {filteredConversations.map((conversation) => {
+                        const isSelected = conversation._id === selectedConversationId;
+                        const hasUnread = unreadConversationIds.has(conversation._id);
+                        return (
+                          <div
+                            key={conversation._id}
+                            onClick={() => selectConversation(conversation._id)}
+                            className={`group relative flex items-start justify-between p-3.5 cursor-pointer transition-colors ${
+                              isSelected
+                                ? "bg-primary/10 border-l-4 border-l-primary"
+                                : "hover:bg-muted/60"
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1 pr-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xs sm:text-sm truncate">
+                                  {conversation.visitorName}
+                                </span>
+                                {hasUnread && (
+                                  <span className="size-2 rounded-full bg-destructive shrink-0" />
+                                )}
+                                <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] text-muted-foreground shrink-0">
+                                  {conversation.type === "support" ? "Support" : "Application"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                                {conversation.lastMessage?.body || conversation.visitorEmail}
+                              </p>
+                              <time className="text-[10px] text-muted-foreground/70 block mt-1">
+                                {new Intl.DateTimeFormat(undefined, {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                  month: "short",
+                                  day: "numeric",
+                                }).format(new Date(conversation.lastMessageAt))}
                               </time>
                             </div>
-                            {item.instructor && <p className="mt-1 text-sm text-muted-foreground">Instructor: {item.instructor}</p>}
-                            {item.description && <p className="mt-2 whitespace-pre-wrap text-sm">{item.description}</p>}
-                            {item.meetingUrl && <a className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4" href={item.meetingUrl} target="_blank" rel="noreferrer">Open meeting link</a>}
-                          </article>
-                        ))}
+                            <button
+                              type="button"
+                              onClick={(e) => void handleDeleteConversation(conversation._id, e)}
+                              title="Delete conversation"
+                              className="opacity-0 group-hover:opacity-100 rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      {!filteredConversations.length && (
+                        <p className="p-6 text-center text-xs text-muted-foreground">
+                          No conversations match that search.
+                        </p>
+                      )}
                     </div>
-                  ) : (
-                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">No upcoming classes have been scheduled.</p>
-                  )}
+
+                    {/* Right: Small, Scrollable Chat Panel */}
+                    <div>
+                      {selectedConversation ? (
+                        <ApplicationChat
+                          key={selectedConversation._id}
+                          conversationId={selectedConversation._id}
+                          visitorName={selectedConversation.visitorName}
+                          mode="admin"
+                          onMessageDeleted={() => setReloadKey((k) => k + 1)}
+                        />
+                      ) : (
+                        <div className="card-soft flex h-[480px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-muted-foreground">
+                          <MessageSquare className="size-8 opacity-40 mb-2" />
+                          <p className="text-sm font-medium">Select a conversation</p>
+                          <p className="text-xs mt-1">Choose a conversation from the left to read and reply.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="card-soft p-12 text-center rounded-2xl border border-border">
+                    <MessageSquare className="size-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                    <p className="font-medium">No messages yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Website visitor chats and applicant messages will appear here.
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {activeSection === "classes" && (
+              <section aria-labelledby="classes-heading" className="space-y-6">
+                <div>
+                  <h2 id="classes-heading" className="text-xl sm:text-2xl font-bold">
+                    Class Scheduling & Management
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Scheduled classes are immediately visible to registered students in their portal.
+                  </p>
                 </div>
-              </div>
-            </section>
-          )}
-        </>
+
+                <div className="grid gap-6 lg:grid-cols-[minmax(18rem,0.75fr)_minmax(0,1.25fr)] items-start">
+                  {/* Add Class Form */}
+                  <form
+                    className="card-soft rounded-2xl border border-border/80 p-5 space-y-3.5 shadow-xs"
+                    onSubmit={(event) => void handleScheduleClass(event)}
+                  >
+                    <h3 className="text-sm font-semibold flex items-center gap-1.5">
+                      <Plus className="size-4 text-primary" /> Schedule New Class
+                    </h3>
+                    <label className="grid gap-1 text-xs font-medium">
+                      Class Title
+                      <input
+                        className="field text-xs sm:text-sm"
+                        name="title"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        placeholder="e.g. Masterclass: Sicilian Defense"
+                      />
+                    </label>
+                    <label className="grid gap-1 text-xs font-medium">
+                      Date & Time
+                      <input className="field text-xs sm:text-sm" name="startsAt" type="datetime-local" required />
+                    </label>
+                    <label className="grid gap-1 text-xs font-medium">
+                      Instructor Name
+                      <input
+                        className="field text-xs sm:text-sm"
+                        name="instructor"
+                        maxLength={100}
+                        placeholder="e.g. GM Alex / Coach Rahul"
+                      />
+                    </label>
+                    <label className="grid gap-1 text-xs font-medium">
+                      Meeting / Zoom Link
+                      <input
+                        className="field text-xs sm:text-sm"
+                        name="meetingUrl"
+                        type="url"
+                        placeholder="https://zoom.us/j/..."
+                        maxLength={500}
+                      />
+                    </label>
+                    <label className="grid gap-1 text-xs font-medium">
+                      Description & Curriculum
+                      <textarea
+                        className="field text-xs sm:text-sm min-h-20 resize-y"
+                        name="description"
+                        maxLength={1000}
+                        placeholder="What will students learn in this session?"
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      className="btn-primary w-full text-xs sm:text-sm py-2.5 font-medium"
+                      disabled={isSavingClass || isLoading}
+                    >
+                      {isSavingClass ? "Saving Class..." : "Publish Upcoming Class"}
+                    </button>
+                  </form>
+
+                  {/* Scheduled Classes List */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      Upcoming Classes ({upcomingClassesCount})
+                    </h3>
+                    {isLoading ? (
+                      <p className="card-soft p-6 text-sm text-muted-foreground text-center">Loading classes...</p>
+                    ) : scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now()).length ? (
+                      <div className="space-y-3">
+                        {scheduledClasses
+                          .filter((item) => Date.parse(item.startsAt) > Date.now())
+                          .map((item) => (
+                            <article
+                              key={item._id}
+                              className="card-soft rounded-xl border border-border/80 p-4 relative group shadow-xs"
+                            >
+                              <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                  <h4 className="font-semibold text-sm sm:text-base">{item.title}</h4>
+                                  <time className="inline-flex items-center gap-1.5 text-xs text-primary font-medium mt-0.5">
+                                    <CalendarDays className="size-3.5" />
+                                    {new Intl.DateTimeFormat(undefined, {
+                                      dateStyle: "full",
+                                      timeStyle: "short",
+                                    }).format(new Date(item.startsAt))}
+                                  </time>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => void handleDeleteClass(item._id)}
+                                  title="Delete class"
+                                  className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                >
+                                  <Trash2 className="size-4" />
+                                </button>
+                              </div>
+
+                              {item.instructor && (
+                                <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1.5">
+                                  <Users className="size-3 text-muted-foreground" />
+                                  Instructor: <span className="font-medium text-foreground">{item.instructor}</span>
+                                </p>
+                              )}
+                              {item.description && (
+                                <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed bg-muted/30 p-2.5 rounded-lg">
+                                  {item.description}
+                                </p>
+                              )}
+                              {item.meetingUrl && (
+                                <a
+                                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary underline underline-offset-4 hover:text-primary/80"
+                                  href={item.meetingUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <ExternalLink className="size-3" />
+                                  Join Meeting Link
+                                </a>
+                              )}
+                            </article>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="card-soft p-8 text-center rounded-xl border border-border">
+                        <Video className="size-6 text-muted-foreground mx-auto mb-2 opacity-50" />
+                        <p className="text-xs text-muted-foreground">No upcoming classes scheduled yet.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            )}
+          </main>
+        </div>
       )}
     </section>
   );
 }
 
-function ApplicationDetails({ application }: { application: Application }) {
-  const studentName =
-    application.studentType === "child" ? application.childName : application.name;
-
-  return (
-    <article className="py-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold">{studentName || "Name not provided"}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {application.studentType === "child" ? "Child" : "Adult"} application
-            {application.childAge ? ` · age ${application.childAge}` : ""}
-          </p>
-        </div>
-        <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-          <CalendarDays className="size-3.5" />
-          {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-            new Date(application.createdAt),
-          )}
-        </time>
-      </div>
-
-      <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        {application.studentType === "child" ? (
-          <>
-            <Detail label="Parent / guardian" value={application.parentName} />
-            <Detail label="Relationship" value={application.relation} />
-          </>
-        ) : (
-          <Detail label="Applicant" value={application.name} />
-        )}
-        <div>
-          <dt className="text-xs text-muted-foreground">Phone</dt>
-          <dd className="mt-0.5 inline-flex items-center gap-1.5">
-            <Phone className="size-3.5 text-primary" />
-            <a href={`tel:${application.phone}`} className="hover:text-primary">
-              {application.phone}
-            </a>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Email</dt>
-          <dd className="mt-0.5 inline-flex min-w-0 items-center gap-1.5">
-            <Mail className="size-3.5 shrink-0 text-primary" />
-            <a href={`mailto:${application.email}`} className="truncate hover:text-primary">
-              {application.email}
-            </a>
-          </dd>
-        </div>
-        <div className="sm:col-span-2">
-          <dt className="text-xs text-muted-foreground">Message</dt>
-          <dd className="mt-0.5 whitespace-pre-wrap break-words">
-            {application.message || "No message provided"}
-          </dd>
-        </div>
-      </dl>
-    </article>
-  );
-}
-
-function Detail({ label, value }: { label: string; value?: string }) {
-  return (
-    <div>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5">{value || "Not provided"}</dd>
-    </div>
-  );
+function StatusBadge({ status }: { status: ApplicationStatus }) {
+  switch (status) {
+    case "enrolled":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="size-3" /> Enrolled
+        </span>
+      );
+    case "contacted":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs font-medium text-purple-600 dark:text-purple-400">
+          <Phone className="size-3" /> Contacted
+        </span>
+      );
+    case "reviewed":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+          <UserCheck className="size-3" /> Reviewed
+        </span>
+      );
+    case "rejected":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
+          <X className="size-3" /> Rejected
+        </span>
+      );
+    case "pending":
+    default:
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+          <Clock className="size-3" /> Pending
+        </span>
+      );
+  }
 }
