@@ -72,39 +72,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
+      { title: "Unique Wellness Institute — Chess & Career Guidance" },
       {
         name: "description",
         content:
-          "Looking for the best chess coaching institute in Mumbai? Explore live online chess classes for kids ages 5–16, structured courses, and tournament preparation.",
+          "International chess coaching and career guidance from Unique Wellness Institute. Explore programs and book a consultation.",
       },
-      {
-        name: "keywords",
-        content:
-          "best chess coaching institute, best chess coaching institute Mumbai, top chess coaching institute Mumbai, chess academy for kids Mumbai, chess coaching for kids in India, online chess classes for kids, live online chess lessons, beginner chess classes for children, small group chess coaching, chess tournament preparation for kids, chess coach for children India, free chess demo class, international chess coaching, career counseling Mumbai, career guidance India, Unique Wellness Institute",
-      },
-      { name: "geo.region", content: "IN-MH" },
-      { name: "geo.placename", content: "Mumbai" },
-      { name: "geo.position", content: "19.0760;72.8777" },
-      { name: "ICBM", content: "19.0760, 72.8777" },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "Unique Wellness Institute" },
-      { property: "og:locale", content: "en_IN" },
-      { property: "og:title", content: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
-      {
-        property: "og:description",
-        content:
-          "Looking for the best chess coaching institute in Mumbai? Explore live online chess classes for kids ages 5–16, structured courses, and tournament preparation.",
-      },
-      { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Best Chess Coaching Institute in Mumbai | Unique Wellness Institute" },
-      {
-        name: "twitter:description",
-        content:
-          "Live online chess classes for kids ages 5–16, structured courses, and tournament preparation in Mumbai. Book a free demo.",
-      },
-      { name: "twitter:image", content: "https://uniquewellnessinstitute.com/logo.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -115,106 +90,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/logo.png", type: "image/png" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": ["EducationalOrganization", "SportsClub", "LocalBusiness"],
-          name: "Unique Wellness Institute",
-          alternateName: ["UWI Chess Academy", "Unique Wellness Institute Mumbai"],
-          url: "https://uniquewellnessinstitute.com",
-          logo: "https://uniquewellnessinstitute.com/logo.png",
-          image: "https://uniquewellnessinstitute.com/logo.png",
-          description:
-            "Chess coaching and career guidance institute based in Mumbai, India, offering live online lessons for children ages 5–16, structured courses, and tournament preparation.",
-          telephone: "+91-9594373644",
-          email: "info@uniquewellnessinstitute.com",
-          priceRange: "₹₹",
-          currenciesAccepted: "INR, USD, GBP, EUR, AED",
-          paymentAccepted: "Credit Card, Debit Card, UPI, Net Banking, Bank Transfer",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Mumbai",
-            addressRegion: "Maharashtra",
-            addressCountry: "IN",
-          },
-          geo: {
-            "@type": "GeoCoordinates",
-            latitude: 19.0760,
-            longitude: 72.8777,
-          },
-          areaServed: [
-            { "@type": "Country", name: "India" },
-            { "@type": "Country", name: "United States" },
-            { "@type": "Country", name: "United Kingdom" },
-            { "@type": "Country", name: "United Arab Emirates" },
-            { "@type": "Country", name: "Canada" },
-            { "@type": "Country", name: "Singapore" },
-            { "@type": "Country", name: "Australia" },
-          ],
-          founder: {
-            "@type": "Person",
-            name: "Mrunal Kore",
-            jobTitle: "Founder",
-          },
-          knowsAbout: [
-            "Chess Coaching",
-            "Chess Tactics and Strategy",
-            "Tournament Chess Preparation",
-            "Career Counseling",
-            "Student Psychometric Guidance",
-          ],
-          contactPoint: {
-            "@type": "ContactPoint",
-            telephone: "+91-9594373644",
-            contactType: "admissions",
-            email: "info@uniquewellnessinstitute.com",
-            areaServed: "Worldwide",
-            availableLanguage: ["English", "Hindi", "Marathi"],
-          },
-          hasOfferCatalog: {
-            "@type": "OfferCatalog",
-            name: "Chess Coaching Programs & Career Guidance",
-            itemListElement: [
-              {
-                "@type": "Offer",
-                itemOffered: {
-                  "@type": "Course",
-                  name: "Beginner Chess Course",
-                  description: "Introduction to chess rules, piece movements, basic tactics and board awareness for kids.",
-                  provider: { "@type": "EducationalOrganization", name: "Unique Wellness Institute" },
-                },
-                price: "5500",
-                priceCurrency: "INR",
-              },
-              {
-                "@type": "Offer",
-                itemOffered: {
-                  "@type": "Course",
-                  name: "Intermediate Chess Course",
-                  description: "Middlegame planning, endgame technique, pins, forks, and competitive tournament play.",
-                  provider: { "@type": "EducationalOrganization", name: "Unique Wellness Institute" },
-                },
-                price: "7000",
-                priceCurrency: "INR",
-              },
-              {
-                "@type": "Offer",
-                itemOffered: {
-                  "@type": "Course",
-                  name: "Advanced Chess Course",
-                  description: "High-level opening repertoires, deep calculation, and mentorship with international coaches.",
-                  provider: { "@type": "EducationalOrganization", name: "Unique Wellness Institute" },
-                },
-                price: "8000",
-                priceCurrency: "INR",
-              },
-            ],
-          },
-        }),
-      },
     ],
   }),
   shellComponent: RootShell,

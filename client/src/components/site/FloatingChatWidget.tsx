@@ -93,6 +93,7 @@ export function FloatingChatWidget() {
         location.pathname === "/auth" ||
         location.pathname === "/dashboard"
     ) return null;
+    if (isCheckingAuthentication || isAuthenticated !== true) return null;
 
     async function handleStartChat() {
         setIsStarting(true);
@@ -231,7 +232,7 @@ function SignInRequired({ onClose }: { onClose: () => void }) {
         <section className="flex h-full min-h-0 flex-col p-5" aria-label="Sign in to chat">
             <header className="flex items-start justify-between gap-3 border-b border-border pb-4">
                 <div>
-                    <h2 className="text-lg font-semibold">Log in or register to chat</h2>
+                    <h2 className="text-lg font-semibold">Sign in to chat</h2>
                 </div>
                 <button
                     type="button"
@@ -243,7 +244,7 @@ function SignInRequired({ onClose }: { onClose: () => void }) {
                 </button>
             </header>
             <Link to="/auth" className="btn-primary mt-5 text-center">
-                Log in or register
+                Sign in or create account
             </Link>
         </section>
     );

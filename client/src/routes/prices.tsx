@@ -1,31 +1,21 @@
-import { chessCourses } from "@/lib/chess-courses";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
+import { chessCourses } from "@/lib/chess-courses";
 
 export const Route = createFileRoute("/prices")({
   head: () => ({
     meta: [
-      { title: "Chess Coaching Fees & Courses | Best Chess Coaching Institute Mumbai" },
+      { title: "Courses & Prices — Unique Wellness Institute" },
       {
         name: "description",
-        content:
-          "Compare fees for structured online chess courses in Mumbai, from beginner to advanced. Explore 16-session batches and book a free demo at Unique Wellness Institute.",
+        content: "Chess courses for every level, with clear course fees and focused coaching.",
       },
-      {
-        name: "keywords",
-        content:
-          "best chess coaching institute Mumbai, chess coaching fees India, chess course price Mumbai, online chess classes cost India, beginner chess course, tournament chess fees",
-      },
-      { property: "og:title", content: "Chess Coaching Fees & Courses | Unique Wellness Institute" },
+      { property: "og:title", content: "Courses & Prices — Unique Wellness Institute" },
       {
         property: "og:description",
-        content:
-          "Explore beginner, intermediate, and advanced chess coaching courses. Transparent fees at ₹9,000 / $90, ₹14,000 / $150, and ₹16,000 / $210.",
+        content: "Explore beginner, intermediate, and advanced chess coaching courses.",
       },
-      { property: "og:url", content: "https://uniquewellnessinstitute.com/prices" },
-      { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
     ],
-    links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/prices" }],
   }),
   component: PricesPage,
 });

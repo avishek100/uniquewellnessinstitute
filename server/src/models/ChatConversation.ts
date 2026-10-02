@@ -16,6 +16,4 @@ const chatConversationSchema = new mongoose.Schema(
     { timestamps: true, versionKey: false },
 );
 
-chatConversationSchema.index({ lastMessageAt: -1 });
-
 export const ChatConversation = mongoose.model("ChatConversation", chatConversationSchema);

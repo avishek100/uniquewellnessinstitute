@@ -29,22 +29,13 @@ export function getVisitorChatSession(): VisitorChatSession | null {
 }
 
 export function saveVisitorChatSession(session: VisitorChatSession): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.sessionStorage.setItem(storageKey, JSON.stringify(session));
-    window.dispatchEvent(new Event(sessionEvent));
-  } catch {
-    // Graceful fallback if storage is blocked
-  }
+  window.sessionStorage.setItem(storageKey, JSON.stringify(session));
+  window.dispatchEvent(new Event(sessionEvent));
 }
 
 export function markVisitorChatRead(): void {
-  try {
-    const session = getVisitorChatSession();
-    if (session) saveVisitorChatSession({ ...session, lastReadAt: new Date().toISOString() });
-  } catch {
-    // Graceful fallback
-  }
+  const session = getVisitorChatSession();
+  if (session) saveVisitorChatSession({ ...session, lastReadAt: new Date().toISOString() });
 }
 
 export function visitorChatSessionEvent(): string {

@@ -1,12 +1,11 @@
 import { useAuthSession } from "@/lib/auth-session";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const nav = [
-  { to: "/chess-coaching", label: "Chess Coaching" },
+  { to: "/prices", label: "Chess Coaching" },
   { to: "/about", hash: "career", label: "Career Guidance" },
-  { to: "/prices", label: "Prices" },
   { to: "/founders", label: "Founder" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -18,17 +17,6 @@ export function SiteHeader() {
   const { data: user } = useAuthSession(location.pathname !== "/admin" && location.pathname !== "/auth");
   const userName = user?.fullName ?? null;
 
-  useEffect(() => {
-    if (!open) return;
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open]);
-
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="container-page flex h-20 items-center justify-between gap-4 py-3">
@@ -36,20 +24,17 @@ export function SiteHeader() {
           <img
             src="/logo.png"
             alt="Unique Wellness Institute"
-            width={128}
-            height={48}
-            decoding="async"
             className="h-12 w-32 object-contain"
           />
         </Link>
 
-        <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-5 xl:flex">
           {nav.map((item) => (
             <Link
               key={`${item.to}:${item.label}`}
               to={item.to}
               {...("hash" in item ? { hash: item.hash } : {})}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
               activeProps={{ className: "text-primary" }}
             >
               {item.label}
@@ -66,11 +51,9 @@ export function SiteHeader() {
           </Link>
           <button
             type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="mobile-nav-menu"
+            aria-label="Toggle menu"
             onClick={() => setOpen((v) => !v)}
-            className="btn-outline size-11 p-0 xl:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="btn-outline size-11 p-0 xl:hidden"
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -78,7 +61,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div id="mobile-nav-menu" className="border-t border-border bg-card xl:hidden">
+        <div className="border-t border-border bg-card md:hidden">
           <div className="container-page flex flex-col gap-1 py-4">
             {nav.map((item) => (
               <Link
@@ -86,7 +69,7 @@ export function SiteHeader() {
                 to={item.to}
                 {...("hash" in item ? { hash: item.hash } : {})}
                 onClick={() => setOpen(false)}
-                className="rounded-md px-2 py-2.5 text-sm font-medium text-foreground hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="rounded-md px-2 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
               >
                 {item.label}
               </Link>

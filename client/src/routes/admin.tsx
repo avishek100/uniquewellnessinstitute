@@ -1,27 +1,7 @@
 import { ApplicationChat } from "@/components/site/ApplicationChat";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { API_BASE_URL, apiClient } from "@/lib/api";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-  CalendarDays,
-  ClipboardList,
-  Mail,
-  MessageCircle,
-  MessagesSquare,
-  Phone,
-  RefreshCw,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { CalendarDays, Mail, MessageCircle, Phone, RefreshCw, Search } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
@@ -42,7 +22,7 @@ type Application = {
 
 type Conversation = {
   _id: string;
-  type: "application" | "support";
+  type?: "application" | "support";
   visitorName: string;
   visitorEmail: string;
   lastMessageAt: string;
@@ -98,8 +78,6 @@ function AdminPage() {
   const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set());
   const [scheduledClasses, setScheduledClasses] = useState<ScheduledClass[]>([]);
   const [isSavingClass, setIsSavingClass] = useState(false);
-  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState("");
   const [conversationSearch, setConversationSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -195,43 +173,6 @@ function AdminPage() {
     );
   });
 
-  async function handleDeleteConversation() {
-    const conversation = selectedConversation;
-    if (!conversation) return;
-
-    setIsDeletingConversation(true);
-    try {
-      const response = await apiClient.request(
-        `/api/admin/conversations/${conversation._id}?type=${conversation.type}`,
-        { method: "DELETE", credentials: "include" },
-      );
-      if (!response.ok) {
-        const result = (await response.json().catch(() => ({}))) as { message?: string };
-        throw new Error(result.message ?? "Could not delete conversation.");
-      }
-
-      const remainingConversations = conversations.filter((item) => item._id !== conversation._id);
-      const nextConversationId = remainingConversations[0]?._id ?? "";
-      setConversations(remainingConversations);
-      selectedConversationIdRef.current = nextConversationId;
-      setSelectedConversationId(nextConversationId);
-      setUnreadConversationIds((current) => {
-        const next = new Set(current);
-        next.delete(conversation._id);
-        next.delete(nextConversationId);
-        return next;
-      });
-      setIsDeleteDialogOpen(false);
-      toast.success("Chat and messages deleted.");
-    } catch (deleteError) {
-      toast.error(
-        deleteError instanceof Error ? deleteError.message : "Could not delete conversation.",
-      );
-    } finally {
-      setIsDeletingConversation(false);
-    }
-  }
-
   async function handleScheduleClass(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -297,385 +238,246 @@ function AdminPage() {
         </div>
       ) : (
         <>
-          <div className="mt-6 grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8">
-            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-              <p className="eyebrow mb-3 hidden px-3 lg:block">Workspace</p>
-              <nav
-                className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:border-r lg:border-border lg:pb-0 lg:pr-4"
-                role="tablist"
-                aria-label="Admin sections"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeSection === "applications"}
-                  aria-controls="applications-panel"
-                  onClick={() => setActiveSection("applications")}
-                  className={`flex min-w-44 items-center justify-between gap-3 rounded-md border px-3 py-3 text-left text-sm font-medium transition-colors lg:w-full ${activeSection === "applications"
-                    ? "border-primary bg-secondary/50 text-foreground"
-                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
+          <div
+            className="mt-6 flex gap-1 border-b border-border"
+            role="tablist"
+            aria-label="Admin sections"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "applications"}
+              onClick={() => setActiveSection("applications")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "applications"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Applications <span className="ml-1.5 text-xs">{applications.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "messages"}
+              onClick={() => setActiveSection("messages")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "messages"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Messages <span className="ml-1.5 text-xs">{conversations.length}</span>
+              {unreadConversationIds.size > 0 && (
+                <span
+                  className="ml-2 inline-grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"
+                  aria-label={`${unreadConversationIds.size} unread conversation${unreadConversationIds.size === 1 ? "" : "s"}`}
                 >
-                  <span className="inline-flex items-center gap-3">
-                    <ClipboardList className="size-4" />
-                    Applications
-                  </span>
-                  <span className="inline-flex min-w-7 justify-center rounded-full bg-muted px-2 py-1 text-xs">
-                    {applications.length}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeSection === "messages"}
-                  aria-controls="messages-panel"
-                  onClick={() => setActiveSection("messages")}
-                  className={`flex min-w-44 items-center justify-between gap-3 rounded-md border px-3 py-3 text-left text-sm font-medium transition-colors lg:w-full ${activeSection === "messages"
-                    ? "border-primary bg-secondary/50 text-foreground"
-                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                >
-                  <span className="inline-flex items-center gap-3">
-                    <MessagesSquare className="size-4" />
-                    Messages
-                  </span>
-                  <span className="inline-flex min-w-7 justify-center rounded-full bg-muted px-2 py-1 text-xs">
-                    {conversations.length}
-                  </span>
-                  {unreadConversationIds.size > 0 && (
-                    <span
-                      className="inline-grid min-w-5 place-items-center rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"
-                      aria-label={`${unreadConversationIds.size} unread conversation${unreadConversationIds.size === 1 ? "" : "s"}`}
-                    >
-                      {unreadConversationIds.size > 99 ? "99+" : unreadConversationIds.size}
-                    </span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeSection === "classes"}
-                  aria-controls="classes-panel"
-                  onClick={() => setActiveSection("classes")}
-                  className={`flex min-w-44 items-center justify-between gap-3 rounded-md border px-3 py-3 text-left text-sm font-medium transition-colors lg:w-full ${activeSection === "classes"
-                    ? "border-primary bg-secondary/50 text-foreground"
-                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                >
-                  <span className="inline-flex items-center gap-3">
-                    <CalendarDays className="size-4" />
-                    Live Classes
-                  </span>
-                  <span className="inline-flex min-w-7 justify-center rounded-full bg-muted px-2 py-1 text-xs">
-                    {scheduledClasses.length}
-                  </span>
-                </button>
-              </nav>
-            </aside>
-
-            <div className="min-w-0">
-              {activeSection === "applications" ? (
-                <section
-                  id="applications-panel"
-                  className="pt-2"
-                  aria-labelledby="applications-heading"
-                  role="tabpanel"
-                >
-                  <div className="mb-4 flex items-end justify-between gap-4">
-                    <div>
-                      <span className="eyebrow">Applications</span>
-                      <h2 id="applications-heading" className="mt-2 text-2xl">
-                        Submitted applications
-                      </h2>
-                    </div>
-                    <span className="text-sm text-muted-foreground" aria-live="polite">
-                      {applications.length} total
-                    </span>
-                  </div>
-
-                  {isLoading ? (
-                    <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                      Loading applications...
-                    </p>
-                  ) : applications.length ? (
-                    <div className="divide-y divide-border border-y border-border">
-                      {applications.map((application) => (
-                        <ApplicationDetails key={application._id} application={application} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                      No applications have been submitted yet.
-                    </p>
-                  )}
-                </section>
-              ) : activeSection === "messages" ? (
-                <section
-                  id="messages-panel"
-                  className="pt-2"
-                  aria-labelledby="messages-heading"
-                  role="tabpanel"
-                >
-                  <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                      <span className="eyebrow">Live support</span>
-                      <h2 id="messages-heading" className="mt-2 text-2xl">
-                        Applicant messages
-                      </h2>
-                    </div>
-                    <div className="flex w-full items-center gap-2 sm:w-auto">
-                      <label className="relative block min-w-0 flex-1 sm:w-64 sm:flex-none">
-                        <span className="sr-only">Search conversations</span>
-                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <input
-                          className="field pl-9"
-                          type="search"
-                          value={conversationSearch}
-                          onChange={(event) => setConversationSearch(event.target.value)}
-                          placeholder="Search name, email, message"
-                        />
-                      </label>
-                      {selectedConversation && (
-                        <button
-                          type="button"
-                          onClick={() => setIsDeleteDialogOpen(true)}
-                          disabled={isDeletingConversation}
-                          aria-label={`Delete chat with ${selectedConversation.visitorName}`}
-                          title="Delete chat"
-                          className="btn-outline grid size-11 shrink-0 place-items-center p-0 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {isLoading ? (
-                    <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                      Loading conversations...
-                    </p>
-                  ) : conversations.length ? (
-                    <div className="grid gap-6 xl:grid-cols-[minmax(15rem,0.65fr)_minmax(0,1.35fr)]">
-                      <div className="max-h-[24rem] divide-y divide-border overflow-y-auto border-y border-border">
-                        {filteredConversations.map((conversation) => (
-                          <button
-                            key={conversation._id}
-                            type="button"
-                            onClick={() => selectConversation(conversation._id)}
-                            aria-pressed={conversation._id === selectedConversationId}
-                            className={`block w-full px-3 py-4 text-left transition-colors hover:bg-muted ${conversation._id === selectedConversationId ? "bg-muted" : ""
-                              }`}
-                          >
-                            <span className="flex items-center gap-2 text-sm font-semibold">
-                              <MessageCircle className="size-4 shrink-0 text-primary" />
-                              <span className="truncate">{conversation.visitorName}</span>
-                              {unreadConversationIds.has(conversation._id) && (
-                                <span
-                                  className="size-2 shrink-0 rounded-full bg-destructive"
-                                  aria-label="Unread messages"
-                                />
-                              )}
-                            </span>
-                            <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
-                              {conversation.lastMessage?.body ?? conversation.visitorEmail}
-                            </span>
-                            <span className="mt-2 flex items-center justify-between gap-2 pl-6 text-[11px] text-muted-foreground">
-                              <span>
-                                {conversation.type === "support" ? "Website chat" : "Application"}
-                              </span>
-                              <time>
-                                {new Intl.DateTimeFormat(undefined, {
-                                  hour: "numeric",
-                                  minute: "2-digit",
-                                }).format(new Date(conversation.lastMessageAt))}
-                              </time>
-                            </span>
-                          </button>
-                        ))}
-                        {!filteredConversations.length && (
-                          <p className="px-4 py-8 text-sm text-muted-foreground">
-                            No conversations match that search.
-                          </p>
-                        )}
-                      </div>
-
-                      {selectedConversation ? (
-                        <ApplicationChat
-                          key={selectedConversation._id}
-                          conversationId={selectedConversation._id}
-                          visitorName={selectedConversation.visitorName}
-                          mode="admin"
-                        />
-                      ) : (
-                        <p className="grid min-h-64 place-items-center border-y border-border text-sm text-muted-foreground">
-                          Choose a conversation to view messages.
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="border-y border-border py-8 text-sm text-muted-foreground">
-                      No conversations yet. Website chats and application conversations will appear
-                      here.
-                    </p>
-                  )}
-
-                  <AlertDialog
-                    open={isDeleteDialogOpen}
-                    onOpenChange={(open) => {
-                      if (!isDeletingConversation) setIsDeleteDialogOpen(open);
-                    }}
-                  >
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This permanently deletes {selectedConversation?.visitorName}&apos;s chat and
-                          all its messages. The application and user account will remain.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeletingConversation}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={(event) => {
-                            event.preventDefault();
-                            void handleDeleteConversation();
-                          }}
-                          disabled={isDeletingConversation}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {isDeletingConversation ? "Deleting..." : "Delete chat"}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </section>
-              ) : (
-                <section
-                  id="classes-panel"
-                  className="pt-2"
-                  aria-labelledby="classes-heading"
-                  role="tabpanel"
-                >
-                  <div className="mb-6">
-                    <span className="eyebrow">Class schedule</span>
-                    <h2 id="classes-heading" className="mt-2 text-2xl">
-                      Upcoming classes
-                    </h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Scheduled classes are visible to all registered students.
-                    </p>
-                  </div>
-
-                  <div className="grid items-start gap-10 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
-                    <form
-                      className="grid gap-4 border-y border-border py-5"
-                      onSubmit={(event) => void handleScheduleClass(event)}
-                    >
-                      <h3 className="text-lg font-semibold">Add a class</h3>
-                      <label className="grid gap-1.5 text-sm font-medium">
-                        Class title
-                        <input
-                          className="field"
-                          name="title"
-                          required
-                          minLength={2}
-                          maxLength={120}
-                        />
-                      </label>
-                      <label className="grid gap-1.5 text-sm font-medium">
-                        Date and time
-                        <input className="field" name="startsAt" type="datetime-local" required />
-                      </label>
-                      <label className="grid gap-1.5 text-sm font-medium">
-                        Instructor
-                        <input className="field" name="instructor" maxLength={100} />
-                      </label>
-                      <label className="grid gap-1.5 text-sm font-medium">
-                        Meeting link
-                        <input
-                          className="field"
-                          name="meetingUrl"
-                          type="url"
-                          placeholder="https://..."
-                          maxLength={500}
-                        />
-                      </label>
-                      <label className="grid gap-1.5 text-sm font-medium">
-                        Details
-                        <textarea
-                          className="field min-h-24 resize-y"
-                          name="description"
-                          maxLength={1000}
-                        />
-                      </label>
-                      <button
-                        type="submit"
-                        className="btn-primary justify-self-start"
-                        disabled={isSavingClass || isLoading}
-                      >
-                        {isSavingClass ? "Adding class..." : "Add upcoming class"}
-                      </button>
-                    </form>
-
-                    <div>
-                      <h3 className="text-lg font-semibold">Scheduled classes</h3>
-                      {isLoading ? (
-                        <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">
-                          Loading class schedule...
-                        </p>
-                      ) : scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now())
-                        .length ? (
-                        <div className="mt-4 divide-y divide-border border-y border-border">
-                          {scheduledClasses
-                            .filter((item) => Date.parse(item.startsAt) > Date.now())
-                            .map((item) => (
-                              <article key={item._id} className="py-5">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                  <h4 className="font-semibold">{item.title}</h4>
-                                  <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                                    <CalendarDays className="size-3.5" />
-                                    {new Intl.DateTimeFormat(undefined, {
-                                      dateStyle: "medium",
-                                      timeStyle: "short",
-                                    }).format(new Date(item.startsAt))}
-                                  </time>
-                                </div>
-                                {item.instructor && (
-                                  <p className="mt-1 text-sm text-muted-foreground">
-                                    Instructor: {item.instructor}
-                                  </p>
-                                )}
-                                {item.description && (
-                                  <p className="mt-2 whitespace-pre-wrap text-sm">
-                                    {item.description}
-                                  </p>
-                                )}
-                                {item.meetingUrl && (
-                                  <a
-                                    className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4"
-                                    href={item.meetingUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Open meeting link
-                                  </a>
-                                )}
-                              </article>
-                            ))}
-                        </div>
-                      ) : (
-                        <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">
-                          No upcoming classes have been scheduled.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </section>
+                  {unreadConversationIds.size > 99 ? "99+" : unreadConversationIds.size}
+                </span>
               )}
-            </div>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeSection === "classes"}
+              onClick={() => setActiveSection("classes")}
+              className={`border-b-2 px-4 py-3 text-sm font-medium ${activeSection === "classes"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Live Classes <span className="ml-1.5 text-xs">{scheduledClasses.length}</span>
+            </button>
           </div>
+
+          {activeSection === "applications" ? (
+            <section className="pt-8" aria-labelledby="applications-heading" role="tabpanel">
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <span className="eyebrow">Applications</span>
+                  <h2 id="applications-heading" className="mt-2 text-2xl">
+                    Submitted applications
+                  </h2>
+                </div>
+                <span className="text-sm text-muted-foreground" aria-live="polite">
+                  {applications.length} total
+                </span>
+              </div>
+
+              {isLoading ? (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  Loading applications...
+                </p>
+              ) : applications.length ? (
+                <div className="divide-y divide-border border-y border-border">
+                  {applications.map((application) => (
+                    <ApplicationDetails key={application._id} application={application} />
+                  ))}
+                </div>
+              ) : (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  No applications have been submitted yet.
+                </p>
+              )}
+            </section>
+          ) : activeSection === "messages" ? (
+            <section className="pt-8" aria-labelledby="messages-heading" role="tabpanel">
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <span className="eyebrow">Live support</span>
+                  <h2 id="messages-heading" className="mt-2 text-2xl">
+                    Applicant messages
+                  </h2>
+                </div>
+                <label className="relative block w-full sm:max-w-xs">
+                  <span className="sr-only">Search conversations</span>
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    className="field pl-9"
+                    type="search"
+                    value={conversationSearch}
+                    onChange={(event) => setConversationSearch(event.target.value)}
+                    placeholder="Search name, email, message"
+                  />
+                </label>
+              </div>
+
+              {isLoading ? (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  Loading conversations...
+                </p>
+              ) : conversations.length ? (
+                <div className="grid min-h-[32rem] gap-6 xl:grid-cols-[minmax(15rem,0.65fr)_minmax(0,1.35fr)]">
+                  <div className="max-h-[42rem] divide-y divide-border overflow-y-auto border-y border-border">
+                    {filteredConversations.map((conversation) => (
+                      <button
+                        key={conversation._id}
+                        type="button"
+                        onClick={() => selectConversation(conversation._id)}
+                        aria-pressed={conversation._id === selectedConversationId}
+                        className={`block w-full px-3 py-4 text-left transition-colors hover:bg-muted ${conversation._id === selectedConversationId ? "bg-muted" : ""
+                          }`}
+                      >
+                        <span className="flex items-center gap-2 text-sm font-semibold">
+                          <MessageCircle className="size-4 shrink-0 text-primary" />
+                          <span className="truncate">{conversation.visitorName}</span>
+                          {unreadConversationIds.has(conversation._id) && (
+                            <span
+                              className="size-2 shrink-0 rounded-full bg-destructive"
+                              aria-label="Unread messages"
+                            />
+                          )}
+                        </span>
+                        <span className="mt-1 block truncate pl-6 text-xs text-muted-foreground">
+                          {conversation.lastMessage?.body ?? conversation.visitorEmail}
+                        </span>
+                        <span className="mt-2 flex items-center justify-between gap-2 pl-6 text-[11px] text-muted-foreground">
+                          <span>
+                            {conversation.type === "support" ? "Website chat" : "Application"}
+                          </span>
+                          <time>
+                            {new Intl.DateTimeFormat(undefined, {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            }).format(new Date(conversation.lastMessageAt))}
+                          </time>
+                        </span>
+                      </button>
+                    ))}
+                    {!filteredConversations.length && (
+                      <p className="px-4 py-8 text-sm text-muted-foreground">
+                        No conversations match that search.
+                      </p>
+                    )}
+                  </div>
+
+                  {selectedConversation ? (
+                    <ApplicationChat
+                      key={selectedConversation._id}
+                      conversationId={selectedConversation._id}
+                      visitorName={selectedConversation.visitorName}
+                      mode="admin"
+                    />
+                  ) : (
+                    <p className="grid min-h-64 place-items-center border-y border-border text-sm text-muted-foreground">
+                      Choose a conversation to view messages.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="border-y border-border py-8 text-sm text-muted-foreground">
+                  No conversations yet. Website chats and application conversations will appear
+                  here.
+                </p>
+              )}
+            </section>
+          ) : (
+            <section className="pt-8" aria-labelledby="classes-heading" role="tabpanel">
+              <div className="mb-6">
+                <span className="eyebrow">Class schedule</span>
+                <h2 id="classes-heading" className="mt-2 text-2xl">Upcoming classes</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Scheduled classes are visible to all registered students.
+                </p>
+              </div>
+
+              <div className="grid items-start gap-10 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
+                <form className="grid gap-4 border-y border-border py-5" onSubmit={(event) => void handleScheduleClass(event)}>
+                  <h3 className="text-lg font-semibold">Add a class</h3>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Class title
+                    <input className="field" name="title" required minLength={2} maxLength={120} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Date and time
+                    <input className="field" name="startsAt" type="datetime-local" required />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Instructor
+                    <input className="field" name="instructor" maxLength={100} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Meeting link
+                    <input className="field" name="meetingUrl" type="url" placeholder="https://..." maxLength={500} />
+                  </label>
+                  <label className="grid gap-1.5 text-sm font-medium">
+                    Details
+                    <textarea className="field min-h-24 resize-y" name="description" maxLength={1000} />
+                  </label>
+                  <button type="submit" className="btn-primary justify-self-start" disabled={isSavingClass || isLoading}>
+                    {isSavingClass ? "Adding class..." : "Add upcoming class"}
+                  </button>
+                </form>
+
+                <div>
+                  <h3 className="text-lg font-semibold">Scheduled classes</h3>
+                  {isLoading ? (
+                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">Loading class schedule...</p>
+                  ) : scheduledClasses.filter((item) => Date.parse(item.startsAt) > Date.now()).length ? (
+                    <div className="mt-4 divide-y divide-border border-y border-border">
+                      {scheduledClasses
+                        .filter((item) => Date.parse(item.startsAt) > Date.now())
+                        .map((item) => (
+                          <article key={item._id} className="py-5">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <h4 className="font-semibold">{item.title}</h4>
+                              <time className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <CalendarDays className="size-3.5" />
+                                {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.startsAt))}
+                              </time>
+                            </div>
+                            {item.instructor && <p className="mt-1 text-sm text-muted-foreground">Instructor: {item.instructor}</p>}
+                            {item.description && <p className="mt-2 whitespace-pre-wrap text-sm">{item.description}</p>}
+                            {item.meetingUrl && <a className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4" href={item.meetingUrl} target="_blank" rel="noreferrer">Open meeting link</a>}
+                          </article>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="mt-4 border-y border-border py-6 text-sm text-muted-foreground">No upcoming classes have been scheduled.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
         </>
       )}
     </section>

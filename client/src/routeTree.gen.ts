@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ChessCoachingRouteImport } from './routes/chess-coaching'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FoundersRouteImport } from './routes/founders'
@@ -38,11 +37,6 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChessCoachingRoute = ChessCoachingRouteImport.update({
-  id: '/chess-coaching',
-  path: '/chess-coaching',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -76,7 +70,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/chess-coaching': typeof ChessCoachingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/founders': typeof FoundersRoute
@@ -88,7 +81,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/chess-coaching': typeof ChessCoachingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/founders': typeof FoundersRoute
@@ -101,7 +93,6 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/chess-coaching': typeof ChessCoachingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/founders': typeof FoundersRoute
@@ -115,7 +106,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/chess-coaching'
     | '/contact'
     | '/dashboard'
     | '/founders'
@@ -127,7 +117,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/chess-coaching'
     | '/contact'
     | '/dashboard'
     | '/founders'
@@ -139,7 +128,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/chess-coaching'
     | '/contact'
     | '/dashboard'
     | '/founders'
@@ -152,7 +140,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
-  ChessCoachingRoute: typeof ChessCoachingRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   FoundersRoute: typeof FoundersRoute
@@ -188,13 +175,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chess-coaching': {
-      id: '/chess-coaching'
-      path: '/chess-coaching'
-      fullPath: '/chess-coaching'
-      preLoaderRoute: typeof ChessCoachingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -240,7 +220,6 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
-  ChessCoachingRoute: ChessCoachingRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   FoundersRoute: FoundersRoute,

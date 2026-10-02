@@ -1,194 +1,160 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-    ArrowRight,
-    BriefcaseBusiness,
-    Building2,
-    CheckCircle2,
-    Compass,
-    GraduationCap,
-    Target,
-} from "lucide-react";
+import { BriefcaseBusiness, LockKeyhole, Trophy, Users, Video } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
     head: () => ({
         meta: [
-            { title: "Career Guidance & Mentorship — Unique Wellness Institute Mumbai" },
+            { title: "About Us — Unique Wellness Institute" },
             {
                 name: "description",
                 content:
-                    "Discover practical mentorship for students and professionals at Unique Wellness Institute, covering career guidance, resume support, and interview preparation.",
+                    "Meet Unique Wellness Institute and explore chess coaching, career guidance, and student support.",
             },
-            {
-                name: "keywords",
-                content:
-                    "career guidance Mumbai, student mentorship, professional development, interview training, resume support, international career coaching",
-            },
-            { property: "og:title", content: "Career Guidance & Mentorship — Unique Wellness Institute Mumbai" },
-            {
-                property: "og:description",
-                content:
-                    "Practical mentorship for students and professionals, with personalized support for careers, interviews, and growth.",
-            },
-            { property: "og:url", content: "https://uniquewellnessinstitute.com/about" },
-            { property: "og:image", content: "https://uniquewellnessinstitute.com/logo.png" },
         ],
-        links: [{ rel: "canonical", href: "https://uniquewellnessinstitute.com/about" }],
     }),
     component: AboutPage,
 });
 
-const serviceCards = [
-    { title: "Career guidance", description: "Find the right path suited to your strengths and aspirations.", icon: Compass },
-    { title: "Interview training", description: "Build confidence, clarity, and effective communication.", icon: BriefcaseBusiness },
-    { title: "Resume building", description: "Showcase your real strengths with professional modern formats.", icon: Target },
-    { title: "Skill mapping", description: "Align your strengths with the competitive global job market.", icon: GraduationCap },
-];
-
-const processSteps = [
+const services = [
     {
-        number: "01",
-        title: "Discovery call",
-        description: "Understand your goals, strengths, and immediate next steps.",
-        icon: Compass,
+        id: "chess",
+        icon: Trophy,
+        eyebrow: "Chess Mastery",
+        title: "International Chess Coaching",
+        description:
+            "For kids aged 5–16. Beginner to advanced batches with tournament preparation under International Coach Mr. Vivek Rane.",
+        action: "View courses",
+        href: "/prices",
     },
     {
-        number: "02",
-        title: "Plan",
-        description: "Build a customized roadmap matching your career direction.",
-        icon: Target,
-    },
-    {
-        number: "03",
-        title: "Execute",
-        description: "Apply targeted coaching, mock interviews, and application support.",
-        icon: Building2,
-    },
-    {
-        number: "04",
-        title: "Land",
-        description: "Move forward with confidence and recruiter-ready positioning.",
-        icon: CheckCircle2,
+        id: "career",
+        icon: BriefcaseBusiness,
+        eyebrow: "Career Guidance",
+        title: "Career & International Employment",
+        description:
+            "Personalised career guidance, interview training, and recruiter-ready resumes, backed by global hospitality, sales, and recruitment experience.",
+        action: "Learn more",
+        href: "/contact",
     },
 ];
 
-const outcomePoints = [
-    "Hospitality, sales, recruitment, and global opportunities.",
-    "Career guidance tailored for both students and working professionals.",
-    "Personalized career roadmaps and active job search support.",
-    "Resume, portfolio, and interview preparation for measurable results.",
+const benefits = [
+    {
+        icon: Video,
+        title: "HD Live Classes",
+        description: "Stable, low-latency video for every session.",
+    },
+    {
+        icon: LockKeyhole,
+        title: "Safe & Secure",
+        description: "Role-based access and encrypted data.",
+    },
+    {
+        icon: Trophy,
+        title: "Tournament Prep",
+        description: "Custom plans for FIDE-rated events.",
+    },
+    {
+        icon: Users,
+        title: "Active Community",
+        description: "Doubt chat, study groups, and peer matches.",
+    },
 ];
 
 function AboutPage() {
     return (
-        <div id="career" className="scroll-mt-24">
-            <section className="border-b border-border bg-sand/50">
+        <>
+            <section className="bg-ink text-ink-foreground">
                 <div className="container-page py-16 lg:py-20">
-                    <span className="eyebrow">Career Guidance</span>
+                    <span className="eyebrow text-primary">About Us</span>
                     <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl">
-                        Practical mentorship for students &amp; professionals
+                        Built on experience, driven by passion.
                     </h1>
-                    <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-                        Enhance skills, industry exposure, and real-world confidence through guided
-                        career planning, interview support, and practical direction.
+                    <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-foreground/75">
+                        Unique Wellness Institute brings world-class chess coaching and career mentorship
+                        together, backed by decades of cross-industry experience.
                     </p>
-                    <div className="mt-8 flex flex-wrap gap-3">
-                        <Link to="/contact" className="btn-gold">
-                            Book a free session <ArrowRight className="size-4" />
-                        </Link>
-                        <Link to="/prices" className="btn-outline">
-                            View course fees
-                        </Link>
+                </div>
+            </section>
+
+            <section className="container-page py-16 lg:py-20">
+                <div className="max-w-2xl">
+                    <span className="eyebrow">What we offer</span>
+                    <h2 className="mt-4 text-3xl sm:text-4xl">Two specialties. One institute.</h2>
+                    <p className="mt-4 text-muted-foreground">
+                        Chess and career guidance, backed by experience and delivered with care.
+                    </p>
+                </div>
+                <div className="mt-9 grid gap-5 lg:grid-cols-2">
+                    {services.map(({ id, icon: Icon, eyebrow, title, description, action, href }) => (
+                        <article key={id} id={id} className="card-soft flex scroll-mt-28 flex-col p-6 sm:p-7">
+                            <Icon className="size-6 text-primary" />
+                            <p className="mt-5 text-xs font-semibold uppercase text-primary">{eyebrow}</p>
+                            <h3 className="mt-2 text-2xl">{title}</h3>
+                            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                                {description}
+                            </p>
+                            {href.startsWith("http") ? (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+                                >
+                                    {action}
+                                </a>
+                            ) : (
+                                <Link
+                                    to={href}
+                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"
+                                >
+                                    {action}
+                                </Link>
+                            )}
+                        </article>
+                    ))}
+                </div>
+            </section>
+
+            <section className="bg-secondary/50 py-16 lg:py-20">
+                <div className="container-page">
+                    <div className="max-w-2xl">
+                        <span className="eyebrow">The experience</span>
+                        <h2 className="mt-4 text-3xl sm:text-4xl">Support at every step.</h2>
+                    </div>
+                    <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {benefits.map(({ icon: Icon, title, description }) => (
+                            <article key={title} className="card-soft p-6">
+                                <Icon className="size-6 text-primary" />
+                                <h3 className="mt-4 text-lg">{title}</h3>
+                                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+                            </article>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            <div className="container-page py-16 lg:py-20">
-                <section>
-                    <div className="max-w-2xl">
-                        <span className="eyebrow">Key pillars</span>
-                        <h2 className="mt-3 text-3xl sm:text-4xl">What we help you achieve</h2>
-                        <p className="mt-3 text-muted-foreground">
-                            Personalized guidance mapped to individual career milestones.
+            <section className="bg-primary py-14 text-primary-foreground sm:py-16">
+                <div className="container-page flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+                    <div>
+                        <h2 className="text-3xl sm:text-4xl">Ready to take the next step?</h2>
+                        <p className="mt-3 text-primary-foreground/75">
+                            Book a free demo class or a career consultation.
                         </p>
                     </div>
-
-                    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        {serviceCards.map(({ title, description, icon: Icon }) => (
-                            <article key={title} className="card-soft flex flex-col p-6">
-                                <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-primary">
-                                    <Icon className="size-6" />
-                                </div>
-                                <h3 className="mt-5 text-xl">{title}</h3>
-                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                    {description}
-                                </p>
-                            </article>
-                        ))}
+                    <div className="flex flex-wrap gap-3">
+                        <Link to="/contact" className="btn-gold">
+                            Book Free Demo
+                        </Link>
+                        <Link
+                            to="/auth"
+                            className="btn-base border border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+                        >
+                            Sign in
+                        </Link>
                     </div>
-                </section>
-
-                <section className="mt-20">
-                    <div className="max-w-2xl">
-                        <span className="eyebrow">Methodology</span>
-                        <h2 className="mt-3 text-3xl sm:text-4xl">A clear, four-step process</h2>
-                        <p className="mt-3 text-muted-foreground">
-                            Structured steps from discovery to career success.
-                        </p>
-                    </div>
-
-                    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        {processSteps.map(({ number, title, description, icon: Icon }) => (
-                            <article key={title} className="card-soft flex flex-col p-6">
-                                <div className="flex items-center justify-between">
-                                    <span className="font-display text-2xl font-bold text-primary">{number}</span>
-                                    <Icon className="size-5 text-accent" />
-                                </div>
-                                <h3 className="mt-4 text-xl">{title}</h3>
-                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                    {description}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mt-20 card-soft p-8 sm:p-10 lg:p-12 bg-secondary/30">
-                    <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-                        <div>
-                            <span className="eyebrow">Results</span>
-                            <h2 className="mt-3 text-3xl sm:text-4xl">Outcomes, not just advice</h2>
-
-                            <ul className="mt-6 space-y-4 text-sm sm:text-base">
-                                {outcomePoints.map((point) => (
-                                    <li key={point} className="flex items-start gap-3">
-                                        <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                                            <CheckCircle2 className="size-4" />
-                                        </span>
-                                        <span className="text-foreground/90">{point}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="card-soft p-6 sm:p-8 bg-card">
-                            <div className="grid size-14 place-items-center rounded-2xl bg-secondary text-primary">
-                                <BriefcaseBusiness className="size-7" />
-                            </div>
-                            <div className="mt-6 font-display text-4xl font-bold text-foreground">
-                                20+ YEARS
-                            </div>
-                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                Cross-sector leadership and mentoring experience in hospitality, sales,
-                                recruitment, and corporate growth.
-                            </p>
-                            <Link to="/contact" className="btn-gold mt-6 inline-flex items-center gap-2">
-                                Book a free session
-                                <ArrowRight className="size-4" />
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
+                </div>
+            </section>
+        </>
     );
 }
