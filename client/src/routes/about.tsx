@@ -93,7 +93,7 @@ const benefits = [
 function AboutPage() {
   return (
     <>
-      <section className="bg-ink text-ink-foreground py-16 lg:py-24">
+      <section className="border-b border-border bg-background text-foreground pt-4 pb-16 lg:pt-4 lg:pb-24">
         <div className="container-page">
           <span className="eyebrow text-primary">About Us</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">

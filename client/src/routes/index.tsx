@@ -251,12 +251,12 @@ function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-ink text-ink-foreground py-16 lg:py-24">
+      <section className="relative overflow-hidden bg-background text-foreground pt-4 pb-16 lg:pt-4 lg:pb-24">
         {/* Ambient Mesh Glows */}
         <div className="pointer-events-none absolute -left-32 -top-32 size-[450px] rounded-full bg-primary/20 blur-[130px]" />
         <div className="pointer-events-none absolute -bottom-32 right-0 size-[400px] rounded-full bg-amber-500/15 blur-[120px]" />
 
-        <div className="container-page relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
+        <div className="container-page relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-16">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-4 py-1 text-xs font-semibold text-primary backdrop-blur-md shadow-xs">
               <span className="relative flex size-2">

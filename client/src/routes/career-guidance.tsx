@@ -1,4 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import careerImage from "@/assets/career.png";
+import englishImage1 from "@/assets/english1.png";
+import englishImage2 from "@/assets/english2.png";
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import {
   ArrowRight,
   BookOpen,
@@ -94,6 +106,12 @@ const outcomePoints = [
   "Recruiter-ready resumes, LinkedIn optimization, and mock interview practice.",
 ];
 
+const guidanceImages = [
+  { src: careerImage, alt: "Career skills, experience, and professional growth" },
+  { src: englishImage1, alt: "Communicative English skills for career success" },
+  { src: englishImage2, alt: "Learning English and building language fluency" },
+];
+
 export const Route = createFileRoute("/career-guidance")({
   head: () => ({
     meta: [
@@ -120,25 +138,69 @@ export const Route = createFileRoute("/career-guidance")({
 });
 
 function CareerGuidancePage() {
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    if (!carouselApi || isCarouselPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const interval = window.setInterval(() => carouselApi.scrollNext(), 1500);
+    return () => window.clearInterval(interval);
+  }, [carouselApi, isCarouselPaused]);
+
   return (
     <main className="bg-background text-foreground">
-      <section className="border-b border-border bg-sand/50">
-        <div className="container-page py-16 lg:py-20">
-          <span className="eyebrow">Career Guidance</span>
-          <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl font-bold tracking-tight">
-            Practical mentorship for students &amp; professionals
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            Enhance skills, industry exposure, and real-world confidence through guided career
-            planning, interview coaching, and strategic positioning.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/contact" className="btn-gold">
-              Book a Free Consultation <ArrowRight className="size-4" />
-            </Link>
-            <Link to="/prices" className="btn-outline">
-              View Course Fees
-            </Link>
+      <section className="border-b border-border bg-background">
+        <div className="container-page grid gap-10 pt-4 pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:pt-4 lg:pb-20">
+          <div>
+            <span className="eyebrow">Career Guidance</span>
+            <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl font-bold tracking-tight">
+              Practical mentorship for students &amp; professionals
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+              Enhance skills, industry exposure, and real-world confidence through guided career
+              planning, interview coaching, and strategic positioning.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/contact" className="btn-gold">
+                Book a Free Consultation <ArrowRight className="size-4" />
+              </Link>
+              <Link to="/prices" className="btn-outline">
+                View Course Fees
+              </Link>
+            </div>
+          </div>
+          <div className="card-soft p-4">
+            <Carousel
+              opts={{ loop: true }}
+              setApi={setCarouselApi}
+              onPointerEnter={() => setIsCarouselPaused(true)}
+              onPointerLeave={() => setIsCarouselPaused(false)}
+            >
+              <CarouselContent>
+                {guidanceImages.map(({ src, alt }) => (
+                  <CarouselItem key={src}>
+                    <div className="overflow-hidden rounded-xl">
+                      <img
+                        src={src}
+                        alt={alt}
+                        className="aspect-[3/2] w-full rounded-xl bg-white object-contain transition-transform duration-700 ease-out hover:scale-[1.03]"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious
+                aria-label="Previous guidance image"
+                className="left-3 top-1/2 -translate-y-1/2"
+              />
+              <CarouselNext
+                aria-label="Next guidance image"
+                className="right-3 top-1/2 -translate-y-1/2"
+              />
+            </Carousel>
           </div>
         </div>
       </section>

@@ -118,8 +118,8 @@ export const Route = createFileRoute("/prices")({
 function PricesPage() {
   return (
     <>
-      <section className="border-b border-border bg-sand/50">
-        <div className="container-page py-16 lg:py-20">
+      <section className="border-b border-border bg-background">
+        <div className="container-page pt-4 pb-16 lg:pt-4 lg:pb-20">
           <span className="eyebrow">Courses &amp; fees</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl">Chess courses for every level</h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">

@@ -47,23 +47,13 @@ const milestones = [
 function FounderPage() {
   return (
     <>
-      <section className="border-b border-border bg-sand/50 py-14 lg:py-16">
-        <div className="container-page">
-          <span className="eyebrow">Leadership</span>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">Meet the Founder</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Mrunal Kore · Founder &amp; Managing Director, Unique Wellness Institute
-          </p>
-        </div>
-      </section>
-
-      <section className="container-page grid gap-10 py-14 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-14 lg:py-20">
+      <section className="container-page grid gap-8 py-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-14 lg:py-8">
         <figure className="group relative overflow-hidden rounded-3xl border border-border/80 bg-card p-3 shadow-md transition-all duration-300 hover:shadow-xl">
           <div className="overflow-hidden rounded-2xl">
             <img
               src={mrunalKore}
               alt="Mrunal Kore, Founder of Unique Wellness Institute"
-              loading="lazy"
+              fetchPriority="high"
               className="aspect-[4/5] w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
             />
           </div>
@@ -83,6 +73,12 @@ function FounderPage() {
         </figure>
 
         <div>
+          <span className="eyebrow">Leadership</span>
+          <h1 className="mt-3 text-4xl sm:text-5xl font-bold tracking-tight">Meet the Founder</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Mrunal Kore · Founder &amp; Managing Director, Unique Wellness Institute
+          </p>
+
           <span className="eyebrow">About the Journey</span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight">
             Passion for mentorship, grounded in global experience.

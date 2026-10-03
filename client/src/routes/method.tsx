@@ -49,7 +49,7 @@ const stages = [
 function MethodPage() {
   return (
     <>
-      <section className="border-b border-border bg-sand/50">
+      <section className="border-b border-border bg-background">
         <div className="container-page py-16 lg:py-20">
           <span className="eyebrow">Method</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl">

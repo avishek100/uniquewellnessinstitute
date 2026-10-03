@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import chessImage from "@/assets/hero-chess.jpg";
 import {
   ArrowRight,
   BookOpen,
@@ -102,14 +103,13 @@ export const Route = createFileRoute("/chess-coaching")({
 function ChessCoachingPage() {
   return (
     <main className="bg-background text-foreground">
-      <section className="container-page py-12 lg:py-16">
-        <div className="eyebrow mb-8 flex items-center gap-2">
-          <span className="inline-block size-2.5 rounded-full bg-accent" />
-          Chess curriculum
-        </div>
-
-        <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+      <section className="container-page pt-4 pb-12 lg:pt-4 lg:pb-16">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
+            <div className="eyebrow mb-8 flex items-center gap-2">
+              <span className="inline-block size-2.5 rounded-full bg-accent" />
+              Chess curriculum
+            </div>
             <h1 className="max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl font-bold tracking-tight">
               Best chess coaching institute for kids ages 5–16.
             </h1>
@@ -134,6 +134,11 @@ function ChessCoachingPage() {
           </div>
 
           <div className="card-soft p-6">
+            <img
+              src={chessImage}
+              alt="Chess pieces arranged on a board"
+              className="mb-4 aspect-[3/2] w-full rounded-xl object-cover"
+            />
             <div className="grid gap-3.5 sm:grid-cols-2">
               {[
                 {
