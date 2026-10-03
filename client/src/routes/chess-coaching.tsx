@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import clearChessImage from "@/assets/clearchess.png";
 import chessImage from "@/assets/hero-chess.jpg";
 import {
   ArrowRight,
@@ -105,40 +106,49 @@ function ChessCoachingPage() {
     <main className="bg-background text-foreground">
       <section className="container-page pt-4 pb-12 lg:pt-4 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div>
-            <div className="eyebrow mb-8 flex items-center gap-2">
-              <span className="inline-block size-2.5 rounded-full bg-accent" />
-              Chess curriculum
-            </div>
-            <h1 className="max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              Best chess coaching institute for kids ages 5–16.
-            </h1>
+          <div className="relative isolate">
+            <img
+              src={clearChessImage}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-contain object-[35%_center] opacity-[15%]"
+            />
+            <div className="relative bg-transparent">
+              <div className="eyebrow mb-8 flex items-center gap-2">
+                <span className="inline-block size-2.5 rounded-full bg-accent" />
+                Chess curriculum
+              </div>
+              <h1 className="max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl font-bold tracking-tight">
+                Best chess coaching institute for kids ages 5–16.
+              </h1>
 
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
-              From first steps to tournament-ready play, our structured online chess program helps
-              children build confidence, focus, and real competitive skills.
-            </p>
+              <p className="mt-5 max-w-lg text-base leading-relaxed font-medium text-foreground">
+                From first steps to tournament-ready play, our structured online chess program helps
+                children build confidence, focus, and real competitive skills.
+              </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact" className="btn-gold inline-flex items-center gap-2">
-                Book a demo
-                <ArrowRight className="size-4" />
-              </Link>
-              <Link
-                to="/prices"
-                className="btn-outline inline-flex items-center gap-2"
-              >
-                See all courses
-              </Link>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/contact" className="btn-gold inline-flex items-center gap-2">
+                  Book a demo
+                  <ArrowRight className="size-4" />
+                </Link>
+                <Link
+                  to="/prices"
+                  className="btn-outline inline-flex items-center gap-2"
+                >
+                  See all courses
+                </Link>
+              </div>
             </div>
           </div>
-
-          <div className="card-soft p-6">
-            <img
-              src={chessImage}
-              alt="Chess pieces arranged on a board"
-              className="mb-4 aspect-[3/2] w-full rounded-xl object-cover"
-            />
+          <div>
+            <div className="mb-4 overflow-hidden rounded-2xl">
+              <img
+                src={chessImage}
+                alt="Chess pieces arranged on a board"
+                className="aspect-[3/2] w-full rounded-2xl object-cover transition-transform duration-500 hover:-translate-y-1"
+              />
+            </div>
             <div className="grid gap-3.5 sm:grid-cols-2">
               {[
                 {

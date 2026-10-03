@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import careerImage from "@/assets/career.png";
+import clearCareerImage from "@/assets/clearcareer.png";
 import englishImage1 from "@/assets/english1.png";
 import englishImage2 from "@/assets/english2.png";
 import {
@@ -154,39 +155,48 @@ function CareerGuidancePage() {
     <main className="bg-background text-foreground">
       <section className="border-b border-border bg-background">
         <div className="container-page grid gap-10 pt-4 pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:pt-4 lg:pb-20">
-          <div>
-            <span className="eyebrow">Career Guidance</span>
-            <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl font-bold tracking-tight">
-              Practical mentorship for students &amp; professionals
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-              Enhance skills, industry exposure, and real-world confidence through guided career
-              planning, interview coaching, and strategic positioning.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact" className="btn-gold">
-                Book a Free Consultation <ArrowRight className="size-4" />
-              </Link>
-              <Link to="/prices" className="btn-outline">
-                View Course Fees
-              </Link>
+          <div className="relative isolate">
+            <img
+              src={clearCareerImage}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 h-full w-full translate-y-7 scale-[1.6] object-contain object-[65%_center] opacity-[15%]"
+            />
+            <div className="relative bg-transparent">
+              <span className="eyebrow">Career Guidance</span>
+              <h1 className="mt-4 max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl font-bold tracking-tight">
+                Practical mentorship for students &amp; professionals
+              </h1>
+              <p className="mt-5 max-w-lg text-base leading-relaxed font-medium text-foreground">
+                Enhance skills, industry exposure, and real-world confidence through guided career
+                planning, interview coaching, and strategic positioning.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/contact" className="btn-gold">
+                  Book a Free Consultation <ArrowRight className="size-4" />
+                </Link>
+                <Link to="/prices" className="btn-outline">
+                  View Course Fees
+                </Link>
+              </div>
             </div>
           </div>
-          <div className="card-soft p-4">
+          <div className="relative">
             <Carousel
               opts={{ loop: true }}
               setApi={setCarouselApi}
+              className="group/carousel"
               onPointerEnter={() => setIsCarouselPaused(true)}
               onPointerLeave={() => setIsCarouselPaused(false)}
             >
               <CarouselContent>
                 {guidanceImages.map(({ src, alt }) => (
                   <CarouselItem key={src}>
-                    <div className="overflow-hidden rounded-xl">
+                    <div className="overflow-hidden rounded-2xl">
                       <img
                         src={src}
                         alt={alt}
-                        className="aspect-[3/2] w-full rounded-xl bg-white object-contain transition-transform duration-700 ease-out hover:scale-[1.03]"
+                        className="aspect-[3/2] w-full rounded-2xl bg-white object-contain transition-transform duration-500 ease-out hover:-translate-y-1"
                       />
                     </div>
                   </CarouselItem>
@@ -194,11 +204,11 @@ function CareerGuidancePage() {
               </CarouselContent>
               <CarouselPrevious
                 aria-label="Previous guidance image"
-                className="left-3 top-1/2 -translate-y-1/2"
+                className="left-3 top-1/2 hidden -translate-y-1/2 opacity-35 transition-opacity sm:inline-flex sm:group-hover/carousel:opacity-100 sm:group-focus-within/carousel:opacity-100"
               />
               <CarouselNext
                 aria-label="Next guidance image"
-                className="right-3 top-1/2 -translate-y-1/2"
+                className="right-3 top-1/2 hidden -translate-y-1/2 opacity-35 transition-opacity sm:inline-flex sm:group-hover/carousel:opacity-100 sm:group-focus-within/carousel:opacity-100"
               />
             </Carousel>
           </div>
