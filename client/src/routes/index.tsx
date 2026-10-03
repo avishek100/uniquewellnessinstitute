@@ -251,7 +251,7 @@ function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-background text-foreground pt-4 pb-16 lg:pt-4 lg:pb-24">
+      <section className="relative overflow-hidden bg-background text-foreground pt-4 pb-8 lg:pt-4 lg:pb-12">
         {/* Ambient Mesh Glows */}
         <div className="pointer-events-none absolute -left-32 -top-32 size-[450px] rounded-full bg-primary/20 blur-[130px]" />
         <div className="pointer-events-none absolute -bottom-32 right-0 size-[400px] rounded-full bg-amber-500/15 blur-[120px]" />
@@ -374,7 +374,7 @@ function Home() {
         </dl>
       </section>
 
-      <section id="services" className="container-page scroll-mt-24 py-20">
+      <section id="services" className="container-page scroll-mt-24 py-8 lg:py-12">
         <div className="max-w-2xl">
           <span className="eyebrow">What we offer</span>
           <h2 className="mt-4 text-3xl sm:text-4xl">Three pillars. One institute.</h2>
@@ -423,7 +423,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="bg-[#f8f9f5] py-16 sm:py-20">
+      <section className="bg-[#f8f9f5] pt-8 pb-6 lg:pt-12 lg:pb-8">
         <div className="container-page mx-auto max-w-5xl">
           <Carousel opts={{ align: "start" }}>
             <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -531,7 +531,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="bg-secondary/40 py-20 relative overflow-hidden">
+      <section className="relative overflow-hidden bg-secondary/40 pt-8 pb-8 lg:pt-12 lg:pb-12">
         <div className="container-page">
           <div className="max-w-2xl">
             <span className="eyebrow">Why Choose Us</span>
@@ -585,7 +585,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="container-page grid gap-12 py-20 lg:grid-cols-[1fr_1fr]">
+      <section className="container-page grid gap-12 py-8 lg:grid-cols-[1fr_1fr] lg:py-12">
         <div>
           <span className="eyebrow">FAQ</span>
           <h2 className="mt-4 text-3xl sm:text-4xl">Frequently asked questions</h2>
@@ -620,7 +620,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="bg-primary py-16 text-primary-foreground sm:py-20">
+      <section className="bg-primary py-8 text-primary-foreground lg:py-12">
         <div className="container-page flex flex-col items-start justify-between gap-7 sm:flex-row sm:items-center">
           <div>
             <span className="text-xs font-semibold uppercase text-primary-foreground/70">

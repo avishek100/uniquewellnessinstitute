@@ -119,7 +119,7 @@ function PricesPage() {
   return (
     <>
       <section className="border-b border-border bg-background">
-        <div className="container-page pt-4 pb-16 lg:pt-4 lg:pb-20">
+        <div className="container-page pt-4 pb-8 lg:pt-4 lg:pb-12">
           <span className="eyebrow">Courses &amp; fees</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl">Chess courses for every level</h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
@@ -129,7 +129,7 @@ function PricesPage() {
         </div>
       </section>
 
-      <section className="container-page py-16 lg:py-20">
+      <section className="container-page py-8 lg:py-12">
         <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
           {pricingCourses.map((plan) => {
             const Icon = plan.icon;
@@ -184,7 +184,7 @@ function PricesPage() {
         </div>
 
         {/* Included across all plans */}
-        <div className="mt-16 rounded-3xl border border-border/80 bg-secondary/30 p-8 sm:p-10">
+        <div className="mt-8 rounded-3xl border border-border/80 bg-secondary/30 p-8 sm:p-10">
           <div className="max-w-2xl">
             <span className="eyebrow">Standard inclusions</span>
             <h3 className="mt-2 text-2xl font-bold">Every course includes</h3>

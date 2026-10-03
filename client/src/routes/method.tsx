@@ -50,7 +50,7 @@ function MethodPage() {
   return (
     <>
       <section className="border-b border-border bg-background">
-        <div className="container-page py-16 lg:py-20">
+        <div className="container-page pt-4 pb-8 lg:pt-4 lg:pb-12">
           <span className="eyebrow">Method</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl">
             Structured training, session by session
@@ -62,7 +62,7 @@ function MethodPage() {
         </div>
       </section>
 
-      <section className="container-page grid gap-12 py-16 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+      <section className="container-page grid gap-12 py-8 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:py-12">
         <ol className="space-y-5">
           {stages.map((stage) => (
             <li key={stage.step} className="card-soft flex gap-5 p-6">

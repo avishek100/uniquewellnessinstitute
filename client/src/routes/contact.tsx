@@ -62,7 +62,7 @@ const contactMethods = [
 
 function ContactPage() {
   return (
-    <section className="container-page grid gap-12 pt-4 pb-16 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pt-4 lg:pb-20">
+    <section className="container-page grid gap-12 pt-4 pb-8 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pt-4 lg:pb-12">
       <div>
         <span className="eyebrow">Get in Touch</span>
         <h1 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">Book a free trial lesson</h1>

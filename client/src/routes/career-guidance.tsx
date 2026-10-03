@@ -154,7 +154,7 @@ function CareerGuidancePage() {
   return (
     <main className="bg-background text-foreground">
       <section className="border-b border-border bg-background">
-        <div className="container-page grid gap-10 pt-4 pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:pt-4 lg:pb-20">
+        <div className="container-page grid gap-10 pt-4 pb-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:pt-4 lg:pb-12">
           <div className="relative isolate">
             <img
               src={clearCareerImage}
@@ -215,7 +215,7 @@ function CareerGuidancePage() {
         </div>
       </section>
 
-      <div className="container-page py-16 lg:py-20">
+      <div className="container-page py-8 lg:py-12">
         <section>
           <div className="max-w-2xl">
             <span className="eyebrow">Core Offerings</span>
@@ -243,7 +243,7 @@ function CareerGuidancePage() {
           </div>
         </section>
 
-        <section className="mt-20">
+        <section className="mt-8 lg:mt-12">
           <div className="max-w-2xl">
             <span className="eyebrow">Methodology</span>
             <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">A clear, four-step journey</h2>
@@ -273,7 +273,7 @@ function CareerGuidancePage() {
           </div>
         </section>
 
-        <section className="mt-20 rounded-3xl border border-border/80 bg-secondary/30 p-8 sm:p-10 lg:p-12">
+        <section className="mt-8 rounded-3xl border border-border/80 bg-secondary/30 p-8 sm:p-10 lg:mt-12 lg:p-12">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
             <div>
               <span className="eyebrow">Proven Results</span>

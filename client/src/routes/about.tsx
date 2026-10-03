@@ -93,7 +93,7 @@ const benefits = [
 function AboutPage() {
   return (
     <>
-      <section className="border-b border-border bg-background text-foreground pt-4 pb-16 lg:pt-4 lg:pb-24">
+      <section className="border-b border-border bg-background text-foreground pt-4 pb-8 lg:pt-4 lg:pb-12">
         <div className="container-page">
           <span className="eyebrow text-primary">About Us</span>
           <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -105,7 +105,7 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="container-page py-16 lg:py-20">
+      <section className="container-page py-8 lg:py-12">
         <div className="max-w-2xl">
           <span className="eyebrow">What we offer</span>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">Three pillars. One institute.</h2>
@@ -136,7 +136,7 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-secondary/40 py-16 lg:py-20">
+      <section className="bg-secondary/40 py-8 lg:py-12">
         <div className="container-page">
           <div className="max-w-2xl">
             <span className="eyebrow">What makes us different</span>
@@ -163,7 +163,7 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-primary py-14 text-primary-foreground sm:py-16">
+      <section className="bg-primary py-8 text-primary-foreground lg:py-12">
         <div className="container-page">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">

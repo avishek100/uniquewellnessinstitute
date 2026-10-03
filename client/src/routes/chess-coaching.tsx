@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import clearChessImage from "@/assets/clearchess.png";
 import chessImage from "@/assets/hero-chess.jpg";
+import classImage1 from "@/assets/image1.webp";
+import classImage2 from "@/assets/image2.webp";
+import classImage3 from "@/assets/image3.png";
+import classImage4 from "@/assets/image4.jpg";
 import {
   ArrowRight,
   BookOpen,
@@ -70,6 +74,25 @@ const reasons = [
   "Safe, supportive, and engaging online batches for children",
 ];
 
+const classImages = [
+  {
+    src: classImage1,
+    alt: "Chess students and tournament winners with their coach",
+  },
+  {
+    src: classImage2,
+    alt: "Students gathered for an in-person chess class",
+  },
+  {
+    src: classImage3,
+    alt: "Chess coach teaching a group of students",
+  },
+  {
+    src: classImage4,
+    alt: "Students learning and playing chess with their coach",
+  },
+];
+
 export const Route = createFileRoute("/chess-coaching")({
   head: () => ({
     meta: [
@@ -104,7 +127,7 @@ export const Route = createFileRoute("/chess-coaching")({
 function ChessCoachingPage() {
   return (
     <main className="bg-background text-foreground">
-      <section className="container-page pt-4 pb-12 lg:pt-4 lg:pb-16">
+      <section className="container-page pt-4 pb-8 lg:pt-4 lg:pb-12">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div className="relative isolate">
             <img
@@ -208,7 +231,28 @@ function ChessCoachingPage() {
         </div>
       </section>
 
-      <section className="container-page py-10 lg:py-16">
+      <section className="container-page pt-6 pb-8 lg:pt-10 lg:pb-12">
+        <div className="mb-8">
+          <span className="eyebrow">Our Classes in Action</span>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Learning, playing, and growing together.
+          </h2>
+        </div>
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+          {classImages.map(({ src, alt }) => (
+            <figure key={src} className="mb-5 break-inside-avoid overflow-hidden rounded-2xl">
+              <img
+                src={src}
+                alt={alt}
+                loading="lazy"
+                className="h-auto w-full rounded-2xl transition-transform duration-500 hover:scale-[1.02]"
+              />
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="container-page py-8 lg:py-12">
         <div className="mb-4">
           <span className="eyebrow">Structured Pathway</span>
           <h2 className="mt-2 text-3xl sm:text-4xl font-bold tracking-tight">
@@ -243,7 +287,7 @@ function ChessCoachingPage() {
         </div>
       </section>
 
-      <section className="container-page pb-16 pt-8 lg:pb-20">
+      <section className="container-page pb-8 pt-8 lg:pb-12">
         <div className="rounded-3xl border border-border/80 bg-secondary/30 p-7 lg:p-10">
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
