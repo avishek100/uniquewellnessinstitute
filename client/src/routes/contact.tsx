@@ -43,8 +43,8 @@ const contactMethods = [
   },
   {
     label: "Phone & WhatsApp",
-    value: "+91 95943 73644",
-    href: "tel:+919594373644",
+    value: "+91 98200 67940",
+    href: "tel:+919820067940",
     subtext: "Mon – Sat, 9:00 AM – 8:00 PM IST",
     icon: Phone,
     badgeBg: "from-amber-500/20 to-yellow-500/10",

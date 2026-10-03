@@ -193,8 +193,8 @@ function AboutPage() {
               </div>
               <div>
                 <p className="text-xs font-semibold text-primary-foreground/70 uppercase">Call or WhatsApp</p>
-                <a href="tel:+919594373644" className="mt-0.5 block font-medium text-primary-foreground hover:underline">
-                  +91 95943 73644
+                <a href="tel:+919820067940" className="mt-0.5 block font-medium text-primary-foreground hover:underline">
+                  +91 98200 67940
                 </a>
               </div>
             </div>

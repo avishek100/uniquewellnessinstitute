@@ -295,8 +295,8 @@ function SignInRequired({ onClose }: { onClose: () => void }) {
 
       <p className="mt-auto border-t border-border/70 pt-3 text-center text-[11px] text-muted-foreground">
         Need immediate help? Call{" "}
-        <a href="tel:+919594373644" className="font-semibold text-primary hover:underline">
-          +91 95943 73644
+        <a href="tel:+919820067940" className="font-semibold text-primary hover:underline">
+          +91 98200 67940
         </a>
       </p>
     </section>
